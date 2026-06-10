@@ -1,23 +1,21 @@
 \chapterstar{Objetivo General}
 
-Diseñar e implementar un sistema de gestión de inventario que, con una base de datos en PostgreSQL, una API desarrollada en FastAPI y una aplicación web desarrollada en React, realice el registro, control de existencias y ventas utilizando un lector de códigos de barras, y realice el monitoreo de las variaciones de temperatura y humedad con un microcontrolador ESP32 con sensor AHT10, para Farmacia Selene.\\
+Desarrollar un sistema de monitoreo de cultivos de jitomate mediante visión artificial y geolocalización, utilizando un dron equipado con cámara y GPS, una Raspberry Pi~4 y modelos de inteligencia artificial capaces de detectar enfermedades, plagas o anomalías en las plantas, generando notificaciones automáticas al usuario a través de Telegram para facilitar la detección temprana y reducir pérdidas agrícolas.\\
 
-% Subsección visible en el índice pero sin salto de página
 \addcontentsline{toc}{chapter}{Objetivos Específicos}
 {\bfseries\fontsize{14pt}{16pt}\selectfont Objetivos Específicos}
 
 \begin{enumerate}[topsep=2pt, itemsep=4pt, parsep=0pt]
-\item Desarrollar una base de datos en PostgreSQL, para almacenar de forma estructurada la información de productos, niveles de inventario, usuarios, registros de ventas y mediciones obtenidas de los sensores.
 
-\item Desarrollar una API en Python utilizando FastAPI y SQLAlchemy para gestionar el registro de inventario, salidas de inventario, autenticación de usuarios y consulta de registros del sensor para publicarla en la plataforma Railway para su integración con la aplicación desarrollada en React.
+\item Automatizar las rutas de vuelo del dron mediante waypoints predefinidos, asegurando la cobertura sistemática y eficiente de las áreas de cultivo designadas para el monitoreo.
 
-\item Desarrollar una aplicación en JavaScript utilizando React para la gestión de inventario, mostrando tableros gráficos, reportes y alertas generadas a partir de los datos obtenidos del sensor para publicarla en la plataforma Vercel para su acceso público.
+\item Establecer la comunicación inalámbrica entre el dron y la Raspberry Pi~4 mediante una red WiFi para la transferencia automática de imágenes capturadas durante el recorrido.
 
-\item Desarrollar un programa en C++ para que el microcontrolador ESP32 adquiera los datos de temperatura y humedad mediante el sensor AHT10 y envíe esta información a la API a través de solicitudes HTTP.  
+\item Desarrollar un sistema de procesamiento digital de imágenes utilizando OpenCV para preparar y optimizar las fotografías obtenidas del cultivo.
 
-\item Diseñar e implementar un gabinete de plástico impreso en 3D en Bambu Studio con medidas de 12×5×5 cm para alojar el microcontrolador ESP32, el sensor AHT10 y la fuente de alimentación, para su instalación en el área de medición de temperatura y humedad.
+\item Implementar un modelo de inteligencia artificial utilizando TensorFlow Lite capaz de identificar anomalías visibles asociadas a enfermedades o plagas en plantas de jitomate.
 
-\item Implementar un lector de códigos de barras que establece conexión Bluetooth con el dispositivo del usuario e integra su funcionamiento en la aplicación web desarrollada en React, para agilizar el registro de productos durante el proceso de ventas en Farmacia Selene.
+\item Desarrollar un sistema de notificaciones remotas mediante un bot de Telegram para enviar alertas automáticas, imágenes y ubicación de anomalías detectadas.
 
 \end{enumerate}
 

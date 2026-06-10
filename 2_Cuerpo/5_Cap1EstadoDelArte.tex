@@ -9,106 +9,259 @@
 \refstepcounter{chapter}
 \addcontentsline{toc}{chapter}{Cap. 1 Estado del arte}
 
-En este capítulo se presenta la evolución de las tecnologías utilizadas en los sistemas de gestión de ventas e inventarios en las pequeñas y medianas empresas, describiendo los avances más representativos de cada época. Asimismo, se realiza un análisis de proyectos similares desarrollados en universidades de México y América Latina en los últimos años, con el propósito de identificar antecedentes relevantes y comprender mejor el alcance del presente proyecto.
+En este capítulo se exploran distintos proyectos y productos comerciales sobre la aplicación de visión artificial, redes neuronales y monitoreo agrícola pensados para facilitar la detección de plagas o enfermedades en cultivos. El propósito es conocer el tipo de tecnología implementada, el monitoreo, y tener un panorama completo de las innovaciones en el campo tanto como en el mercado.
 
 
 % =============================================
-% SECCIÓN 1: EVOLUCIÓN DE LAS TECNOLOGÍAS
+% SECCIÓN 1.1: PROYECTOS ACADÉMICOS
 % =============================================
 
-\section{Evolución de las tecnologías para los sistemas de gestión de ventas e inventarios en las pequeñas y medianas empresas}
+\section{Proyectos académicos}
 
-La historia de estas tecnologías es, en esencia, una historia de democratización. Lo que antes era exclusivo de grandes corporaciones multinacionales ---como el control de inventarios con actualización inmediata--- hoy está al alcance de una tienda local gracias a la computación en la nube. Esta transformación puede dividirse en cuatro grandes etapas.
+\subsection{Detección de la plaga langosta mediante visión por computadora en el cultivo de arroz}
 
-\subsection{Era de digitalización temprana: hojas de cálculo y códigos de barras (años 90 -- 2000)}
+En la Universidad Agraria del Ecuador, Pin Morán Anthony Leonel y Puente Fárez Jonathan Xavier desarrollaron en 2023 un proyecto cuyo objetivo principal fue diseñar un sistema capaz de identificar de manera temprana la presencia de langostas en plantaciones de arroz mediante técnicas de procesamiento digital de imágenes y visión artificial.
 
-Con la llegada de las computadoras personales, las PyMEs dieron su primer salto tecnológico. Las hojas de cálculo comenzaron a reemplazar al papel, permitiendo cálculos automáticos; sin embargo, seguían siendo estáticas: si se realizaba una venta, era necesario actualizar el registro manualmente en la computadora.
+Para el desarrollo del proyecto se emplearon herramientas de visión por computadora orientadas a la adquisición y análisis de imágenes de los cultivos, permitiendo reconocer patrones característicos de la plaga. La implementación de estas tecnologías tuvo como finalidad automatizar el monitoreo agrícola y reducir el tiempo requerido para la detección manual realizada por los productores.
 
-El código de barras fue la primera gran tecnología de hardware adoptada masivamente por las PyMEs. Su implementación permitió agilizar el proceso de cobro y reducir significativamente los errores humanos asociados al ingreso manual de precios y referencias de productos.
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox[c][5cm][c]{0.85\textwidth}{\centering\textit{[Imagen pendiente]}}}
+    \caption{Arquitectura de hardware y software del sistema de detección de langosta}
+    \label{fig:1_1_1}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} Pin Morán y Puente Fárez (2023).
+\end{figure}
 
-\subsection{Revolución de la nube (2010 -- 2020)}
+En la Fig.~\ref{fig:1_1_1} se muestra la arquitectura física y lógica utilizada. El sistema propuesto opera mediante la captura de imágenes por medio de un dron y una cámara V2 de cultivos de arroz, las cuales son procesadas utilizando técnicas de visión por computadora. El sistema web se desarrolló mediante los lenguajes de programación Python ---utilizado para el algoritmo de redes neuronales convolucionales--- JavaScript, PHP, Ajax y hojas de estilo CSS para estructurar y darle estilo a la página web, además de almacenar información en una base de datos MySQL. El método de notificación es mediante una página web.
 
-Esta etapa representa el punto de inflexión más crítico para las PyMEs. El modelo de distribución de software cambió radicalmente: en lugar de adquirir una licencia permanente, los negocios podían acceder a plataformas mediante suscripciones mensuales de bajo costo, de manera similar a como funcionan hoy los servicios de streaming.
+Los resultados obtenidos demostraron que el uso de sistemas inteligentes basados en visión artificial constituye una alternativa viable para el monitoreo de cultivos, facilitando la identificación oportuna de plagas y contribuyendo a disminuir las pérdidas económicas ocasionadas por infestaciones no detectadas a tiempo.
 
-Por primera vez, los propietarios de pequeños negocios podían consultar sus ventas con datos actualizados desde cualquier dispositivo y desde cualquier lugar. Los sistemas de planificación de recursos empresariales (ERP), que anteriormente representaban una inversión de miles de dólares, se volvieron accesibles para negocios de pequeña y mediana escala.
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox[c][5cm][c]{0.85\textwidth}{\centering\textit{[Imagen pendiente]}}}
+    \caption{Pruebas del modelo de detección de langosta}
+    \label{fig:1_1_2}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} Pin Morán y Puente Fárez (2023).
+\end{figure}
 
-\subsection{Era de la inteligencia (2020 -- actualidad)}
 
-En la etapa actual, las tecnologías de gestión han dejado de limitarse al registro de lo ocurrido para comenzar a anticipar lo que ocurrirá. Los sistemas modernos incorporan inteligencia artificial que analiza patrones históricos y genera alertas automáticas ---por ejemplo, para recordar al administrador que debe reabastecer ciertos productos antes de una temporada de alta demanda.
+\subsection{Implementación de un rover automatizado con tecnología de visión artificial para la clasificación de plantas sanas y enfermas en cultivos de ciclo corto}
 
-Paralelamente, el Internet de las Cosas (IoT) ha introducido dispositivos como las etiquetas RFID, que permiten realizar un conteo completo del inventario en cuestión de segundos, sin necesidad de que el escáner tenga línea de visión directa con cada producto. Estas tecnologías representan el horizonte hacia el que apunta el presente proyecto.
+En 2024, investigadores de la Universidad Estatal Península de Santa Elena desarrollaron un proyecto para la clasificación de tres tipos de plantas sanas y enfermas en cultivos de ciclo corto. El objetivo principal fue diseñar un vehículo terrestre autónomo capaz de desplazarse por cultivos y analizar el estado fitosanitario de las plantas mediante técnicas de visión e inteligencia artificiales.
+
+El sistema fue construido sobre una plataforma móvil tipo rover equipada con una Raspberry Pi~4, una cámara para adquisición de imágenes y sensores de movimiento. El procesamiento de imágenes se realizó utilizando Python y la librería OpenCV, mientras que la clasificación de las plantas se llevó a cabo mediante modelos de aprendizaje automático desarrollados con TensorFlow, incluyendo redes neuronales tipo perceptrón multicapa y redes neuronales convolucionales.
+
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox[c][5cm][c]{0.85\textwidth}{\centering\textit{[Imagen pendiente]}}}
+    \caption{Esquema del rover automatizado para clasificación de plantas}
+    \label{fig:1_1_3}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} González Zambrano y Villón González (2024).
+\end{figure}
+
+Inicialmente, el sistema identificaba las plantas mediante características geométricas y cromáticas de las hojas. Para ello, convertía las imágenes del espacio RGB al espacio HSV, permitiendo segmentar el color verde predominante en las plantas. Posteriormente, se emplearon técnicas de detección de contornos y cálculo de áreas mediante OpenCV para diferenciar especies vegetales según la forma y dimensiones de sus hojas.
+
+Como mejora al sistema, se implementaron modelos de inteligencia artificial entrenados con imágenes de plantas sanas y enfermas, permitiendo una clasificación más robusta que no dependiera únicamente de rangos de color predefinidos. Esta metodología incrementó la capacidad del sistema para detectar enfermedades y plagas en tiempo real durante el recorrido del rover por el cultivo.
+
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox[c][5cm][c]{0.85\textwidth}{\centering\textit{[Imagen pendiente]}}}
+    \caption{Resultados de inferencia con el modelo entrenado del rover}
+    \label{fig:1_1_4}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} González Zambrano y Villón González (2024).
+\end{figure}
+
+Los resultados demostraron la viabilidad de integrar robótica móvil, visión artificial y aprendizaje profundo en aplicaciones de agricultura de precisión. El rover logró desplazarse autónomamente por los cultivos mientras capturaba imágenes y realizaba la clasificación automática de diferentes especies vegetales y su estado sanitario.
+
+Este antecedente es de gran relevancia para el presente proyecto, ya que emplea tecnologías similares como Raspberry Pi, OpenCV, TensorFlow y sistemas de visión artificial para la identificación de plantas y detección de enfermedades.
+
+
+\subsection{Diseño de sistema de monitoreo para detección temprana de enfermedades y plagas superficiales en plantas mediante visión artificial}
+
+En 2023, investigadores del Instituto Politécnico Nacional y la Universidad Autónoma del Estado de Hidalgo desarrollaron un sistema de monitoreo orientado a la detección temprana de enfermedades y plagas superficiales en plantas mediante técnicas de visión artificial. El objetivo principal fue automatizar las tareas de inspección agrícola para identificar irregularidades en el follaje asociadas con enfermedades, plagas, estrés hídrico, hongos o deficiencias nutricionales.
+
+El sistema propuesto se compone de una cámara web instalada sobre un vehículo móvil terrestre, una tarjeta de procesamiento basada en Raspberry Pi y un programa desarrollado en Python para la adquisición y análisis de imágenes. La arquitectura permite recorrer áreas de cultivo y capturar imágenes del follaje para su posterior procesamiento automático.
+
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox[c][5cm][c]{0.85\textwidth}{\centering\textit{[Imagen pendiente]}}}
+    \caption{Sistema clasificador y vehículo de desplazamiento}
+    \label{fig:1_1_5}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} Hernández-Rojas et al. (2023).
+\end{figure}
+
+La metodología implementada consta de tres etapas principales:
+
+\begin{enumerate}[topsep=2pt, itemsep=4pt, parsep=0pt]
+    \item \textbf{Clasificación de colores mediante lógica difusa.} El sistema utiliza OpenCV para segmentar el color verde predominante en las hojas. Debido a las variaciones de iluminación en ambientes agrícolas, los autores implementaron un clasificador difuso que ajusta dinámicamente los umbrales RGB para mejorar la detección.
+    \item \textbf{Detección de irregularidades.} Una vez segmentada la imagen, el algoritmo identifica zonas vacías, manchas o regiones con colores distintos al verde, las cuales pueden estar relacionadas con enfermedades, plagas o daños en las hojas.
+    \item \textbf{Construcción de una base de datos.} Cuando se detectan anomalías, las imágenes son almacenadas automáticamente para su posterior análisis por especialistas agrícolas.
+\end{enumerate}
+
+Las pruebas experimentales se realizaron en áreas verdes de la ESIME Zacatenco, donde el sistema logró detectar correctamente irregularidades en arbustos bajo condiciones reales de iluminación variable. Los resultados demostraron que el clasificador difuso permitió adaptar el sistema a diferentes tonalidades de verde sin necesidad de recalibraciones constantes.
+
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox[c][5cm][c]{0.85\textwidth}{\centering\textit{[Imagen pendiente]}}}
+    \caption{Captura con cámara externa de espacio identificado con irregularidades en la Zona~1 de interés en los arbustos}
+    \label{fig:1_1_6}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} Hernández-Rojas et al. (2023).
+\end{figure}
+
+Este trabajo integra visión artificial, OpenCV, Python, lógica difusa y automatización del monitoreo agrícola. Asimismo, demuestra la viabilidad de utilizar sistemas inteligentes para la detección temprana de problemas fitosanitarios en cultivos, reduciendo costos de inspección y mejorando la toma de decisiones en agricultura de precisión.
+
+
+\subsection{Desarrollo de un equipo electrónico orientado al diagnóstico de la mancha polilla presente en plantaciones de tomate cultivados en ambientes controlados basado en procesamiento digital de imágenes e inteligencia artificial}
+
+En 2025, en la Universidad Peruana de Ciencias Aplicadas (UPC), los autores Fernández Terrones Andrés Alberto y Huachillo Castro Sebastián Martin tuvieron como objetivo desarrollar un dispositivo portátil capaz de detectar enfermedades en hojas de tomate mediante técnicas de visión artificial e inteligencia artificial. La propuesta se enfocó principalmente en la identificación de enfermedades como tizón temprano, tizón tardío, mildiu y daños ocasionados por la polilla del tomate (\textit{Tuta absoluta}), las cuales representan una de las principales causas de pérdidas económicas en la producción agrícola.
+
+Para el desarrollo del sistema se utilizó una plataforma basada en Raspberry Pi~4B de 8~GB de RAM, una cámara Raspberry Pi~V3 de 12~MP, una pantalla táctil de 7~pulgadas y una interfaz gráfica desarrollada en Python mediante la librería Tkinter. El dispositivo permitía capturar imágenes de las hojas directamente en campo y almacenarlas para su posterior análisis.
+
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox[c][5cm][c]{0.85\textwidth}{\centering\textit{[Imagen pendiente]}}}
+    \caption{Implementación del algoritmo de captura de imagen en el invernadero}
+    \label{fig:1_1_7}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} Fernández Terrones y Huachillo Castro (2025).
+\end{figure}
+
+La metodología implementada consistió en varias etapas de procesamiento digital de imágenes. Inicialmente, las imágenes fueron convertidas del espacio de color RGB al modelo HSV para facilitar la segmentación de las hojas. Posteriormente, se aplicaron filtros para reducir ruido, se generaron máscaras de segmentación y se eliminaron objetos no deseados mediante umbrales de área.
+
+Para la detección inteligente de enfermedades se emplearon técnicas de aprendizaje profundo. Los autores utilizaron modelos de segmentación semántica basados en DeepLabV3+ con ResNet50 y posteriormente el modelo U-Net, complementados con técnicas de Data Augmentation para aumentar el conjunto de entrenamiento y mejorar la capacidad de generalización del sistema. Además, se implementaron redes neuronales convolucionales (CNN) para la clasificación automática de hojas sanas y enfermas.
+
+Los resultados demostraron que la combinación de visión artificial, segmentación semántica y redes neuronales convolucionales permite identificar de manera eficiente enfermedades presentes en hojas de tomate, proporcionando una herramienta portátil para el monitoreo fitosanitario en ambientes agrícolas.
+
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox[c][5cm][c]{0.85\textwidth}{\centering\textit{[Imagen pendiente]}}}
+    \caption{Resultado de clasificación en macetas}
+    \label{fig:1_1_8}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} Fernández Terrones y Huachillo Castro (2025).
+\end{figure}
+
+
+\subsection{Identificación de las principales enfermedades de la planta del café (\textit{Coffea arabica}) a través de visión artificial}
+
+En 2023, los investigadores Oscar Eder Flores Colorado, Jair Cervantes Canales, Farid García-Lamont y José Sergio Ruiz Castilla publicaron el trabajo titulado ``Identificación de las principales enfermedades de la planta del café (\textit{Coffea arabica}) a través de visión artificial''. El objetivo principal fue desarrollar un sistema capaz de identificar automáticamente enfermedades presentes en plantas de café mediante técnicas de visión artificial e inteligencia artificial, con el fin de apoyar el monitoreo fitosanitario y reducir pérdidas en la producción agrícola.
+
+La propuesta se enfocó en el análisis de imágenes de hojas de café para detectar síntomas asociados a enfermedades comunes del cultivo. Para ello, los autores emplearon técnicas de procesamiento digital de imágenes y algoritmos de visión artificial que permitieran reconocer patrones visuales característicos de hojas afectadas. Estas tecnologías facilitaron la automatización del diagnóstico, disminuyendo la dependencia de inspecciones manuales realizadas por especialistas.
+
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox[c][5cm][c]{0.85\textwidth}{\centering\textit{[Imagen pendiente]}}}
+    \caption{Diferentes técnicas de segmentación aplicadas a las hojas de café}
+    \label{fig:1_1_9}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} Flores Colorado et al. (2023).
+\end{figure}
+
+Los resultados mostraron que el uso de sistemas de visión artificial constituye una alternativa viable para la identificación temprana de enfermedades en cultivos agrícolas, permitiendo detectar anomalías de forma rápida y objetiva. Asimismo, el estudio destacó el potencial de estas herramientas para integrarse en sistemas de agricultura de precisión orientados al monitoreo continuo de plantaciones de café.
 
 
 % =============================================
-% SECCIÓN 2: PROYECTOS SIMILARES
+% SECCIÓN 1.2: PROYECTOS COMERCIALES
 % =============================================
 
-\section{Proyectos similares}
+\section{Proyectos comerciales}
 
-\subsection{``Sistema de Información para el Control de Inventarios del Almacén del ITS''}
-\textit{Instituto Tecnológico de Saltillo, Saltillo, México. Abril de 2011.}
+\subsection{DJI Agriculture}
 
-Este proyecto fue desarrollado para el Departamento de Recursos Materiales y Servicios del Instituto Tecnológico de Saltillo, con el objetivo de automatizar el control de inventarios del almacén institucional. En ese momento, la gestión se realizaba de forma completamente manual, utilizando formatos en Word y Excel, lo que dificultaba la obtención de información oportuna y confiable.
+DJI Agriculture es una división de la empresa china DJI especializada en el desarrollo de soluciones tecnológicas para la agricultura de precisión mediante el uso de vehículos aéreos no tripulados (UAV). Sus plataformas permiten realizar tareas de monitoreo, análisis y gestión de cultivos con el objetivo de optimizar la producción agrícola y reducir los costos operativos.
 
-El control de existencias se llevaba mediante tarjetas denominadas Kárdex, en las que se registraba cada unidad, su valor de compra, la fecha de adquisición y la fecha de salida del inventario. Si bien este método permitía conocer el saldo exacto en un momento dado, resultaba poco eficiente y propenso a errores.
+Los drones agrícolas desarrollados por DJI incorporan cámaras de alta resolución, sistemas de posicionamiento global (GPS), sensores multiespectrales y tecnologías de navegación autónoma que permiten capturar información detallada del estado de los cultivos. A partir de las imágenes obtenidas, los agricultores pueden identificar zonas afectadas por plagas, enfermedades, deficiencias nutricionales o estrés hídrico, facilitando la toma de decisiones oportunas para el manejo del cultivo.
 
-Para el desarrollo del sistema se empleó la metodología de programación extrema (XP), que comprende cuatro actividades principales: planeación, diseño, codificación y pruebas. El prototipo fue construido iterativamente con la participación activa de los usuarios, y la solución final fue desarrollada en Visual Basic 6.0 con una base de datos en Access 2003.
+Entre los equipos más utilizados se encuentran los modelos de la serie DJI Agras T50 y DJI Agras T25, los cuales combinan capacidades de monitoreo y aplicación de insumos agrícolas. Estos sistemas permiten realizar vuelos programados de manera autónoma, generar mapas del terreno y aplicar tratamientos de forma precisa únicamente en las zonas que lo requieren.
 
-Este proyecto es relevante como antecedente porque ilustra una problemática común en instituciones que aún operan con procesos manuales, y la necesidad de migrar hacia sistemas de información digitales que centralicen y agilicen la gestión del inventario.
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox[c][5cm][c]{0.85\textwidth}{\centering\textit{[Imagen pendiente]}}}
+    \caption{DJI Agras T50}
+    \label{fig:1_2_1}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} DJI Agriculture (2025).
+\end{figure}
 
-
-\subsection{``Sistema Control de Inventario''}
-\textit{Instituto Universitario Tecnológico de Antioquia, Medellín, Colombia. 2018.}
-
-Este trabajo fue desarrollado para el almacén de la Fundación Cementerio de San Pedro, con el propósito de resolver las deficiencias en la gestión de inventarios que generaban gastos innecesarios, descontrol en los niveles de stock y dificultades para coordinar las órdenes de compra a proveedores.
-
-La propuesta incluyó el diseño de un sistema de control de inventarios orientado a mantener niveles óptimos de existencias, agilizar los procesos de compra y establecer un esquema de gestión documentado. El proyecto identificó que la ausencia de políticas y procedimientos formales de control era la causa raíz de los problemas existentes.
-
-Este proyecto aporta como referencia la importancia de documentar los procesos y establecer criterios claros de gestión de inventario antes de implementar cualquier solución tecnológica, algo que también resulta aplicable al contexto de la Farmacia Selene.
+Las tecnologías empleadas por DJI Agriculture incluyen visión artificial, procesamiento digital de imágenes, inteligencia artificial, sistemas de navegación satelital, sensores de percepción remota y comunicaciones inalámbricas para la transmisión de datos. La integración de estas herramientas convierte a los drones en plataformas eficientes para el monitoreo agrícola en tiempo real.
 
 
-\subsection{``Diseño de un Sistema de Control de Inventario y Organización de las Bodegas de Producto Terminado de la Empresa ECUAESPUMAS-LAMITEX S.A.''}
-\textit{Universidad Politécnica Salesiana, Cuenca, Ecuador. Marzo de 2018.}
+\subsection{John Deere See \& Spray}
 
-Este proyecto técnico abordó los problemas de administración de inventarios y organización física de las bodegas de producto terminado en una empresa del sector manufacturero. El enfoque fue tanto metodológico como operativo, combinando el diseño de un sistema de control con una propuesta de reorganización de los espacios de almacenamiento.
+John Deere See \& Spray es una tecnología desarrollada por la empresa estadounidense John Deere, diseñada para optimizar la aplicación de herbicidas mediante el uso de visión artificial e inteligencia artificial. Su principal objetivo es identificar malezas en tiempo real y aplicar productos fitosanitarios únicamente en las áreas donde son necesarios, reduciendo el desperdicio de insumos y el impacto ambiental.
 
-La propuesta de mejora se basó en dos pilares: el sistema de inventario periódico y la metodología de las 5S, orientada a mejorar las condiciones de trabajo mediante la clasificación, organización, limpieza, estandarización y autodisciplina. Para el análisis se utilizaron técnicas como el análisis ABC ---que clasifica los productos según su rotación y valor monetario--- y el diagrama de Pareto, que permitió identificar los productos de mayor impacto en el inventario.
+El sistema emplea múltiples cámaras de alta resolución instaladas a lo largo de los equipos agrícolas. Durante el recorrido por el campo, las cámaras capturan imágenes continuamente del terreno y las envían a unidades de procesamiento equipadas con algoritmos de inteligencia artificial. Estos algoritmos analizan las imágenes en tiempo real para diferenciar las plantas de cultivo de las malezas presentes en el terreno.
 
-La recopilación de información se realizó mediante observación directa e investigación bibliográfica, lo que permitió obtener un diagnóstico preciso del estado actual sin interferir en las actividades del personal. Este proyecto es relevante como referencia metodológica, ya que muestra cómo el análisis previo del contexto operativo es determinante para el diseño de una solución adecuada.
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox[c][5cm][c]{0.85\textwidth}{\centering\textit{[Imagen pendiente]}}}
+    \caption{Cámara integrada del sistema John Deere See \& Spray}
+    \label{fig:1_2_2}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} John Deere (2025).
+\end{figure}
 
+Una vez identificadas las malezas, el sistema activa de forma automática las boquillas de pulverización ubicadas sobre la zona afectada, aplicando herbicida únicamente donde es requerido. Este proceso ocurre en fracciones de segundo, permitiendo realizar la detección y aplicación simultáneamente mientras la maquinaria se desplaza por el cultivo.
 
-\subsection{``Implementación de un sistema de control de inventarios por medio del método PEPS en la empresa Comercializadora de Porcinos Mirasol S.A. de C.V.''}
-\textit{Universidad Abierta y a Distancia de México, México. Junio de 2018.}
-
-Este proyecto fue desarrollado para una empresa comercializadora de productos cárnicos refrigerados, cuyo principal problema era la falta de control en el área de almacén ---cámaras de refrigeración--- lo que provocaba diferencias entre el inventario físico y el registrado, mermas por producto caducado y la necesidad de procesos costosos de sanitización.
-
-La solución implementada se basó en el método PEPS (Primeras Entradas, Primeras Salidas), junto con el cálculo de niveles mínimos, máximos y puntos de reorden para cada producto. Esto permitió prevenir el desabasto y evitar la acumulación innecesaria de mercancía próxima a caducar.
-
-Un aspecto destacable del proyecto fue la capacitación del personal, que resultó ser el momento más significativo del proceso: involucrar a los usuarios finales garantizó la adopción correcta del sistema. Este antecedente es especialmente relevante para el presente proyecto, ya que la Farmacia Selene también maneja productos con fecha de caducidad cuyo almacenamiento depende de condiciones ambientales controladas.
-
-
-\subsection{``Propuesta de un sistema de gestión de inventarios para el almacén de la empresa COVIM S.A. de C.V.''}
-\textit{Universidad de Sotavento, Coatzacoalcos, México. Noviembre de 2019.}
-
-Este proyecto desarrolló estrategias de control y organización de inventarios para una empresa de suministros industriales, con el objetivo de mejorar sus procesos internos y la calidad del servicio al cliente. La propuesta se articuló en tres frentes complementarios.
-
-En primer lugar, se propuso la implementación de la metodología 5S para ordenar y estandarizar el espacio físico del almacén. En segundo lugar, se planteó el método de clasificación ABC para priorizar el manejo de los materiales según su impacto económico, clasificándolos en tres categorías: alto volumen monetario (A), volumen monetario medio (B) y bajo volumen monetario (C). En tercer lugar, se diseñaron los documentos de control necesarios para formalizar los procesos, incluyendo órdenes de compra, requisiciones de materiales y tarjetas Kárdex.
-
-Este proyecto subraya que la gestión eficaz del inventario requiere tanto herramientas tecnológicas como procesos documentados y personal capacitado. Su enfoque integral coincide con los principios que guían el desarrollo del presente proyecto para la Farmacia Selene.
+La tecnología See \& Spray combina visión artificial, aprendizaje profundo, procesamiento digital de imágenes, sistemas GPS de alta precisión y control automatizado de pulverización. Gracias a esta integración tecnológica, los agricultores pueden reducir significativamente el consumo de herbicidas, mejorar la eficiencia de los tratamientos y disminuir los costos operativos.
 
 
-\subsection{``Propuesta para la administración de inventarios basada en tecnología de código de barras''}
-\textit{Universidad Autónoma del Estado de Hidalgo, Hidalgo, México. Mayo de 2023.}
+\subsection{Plantix}
 
-Este proyecto propuso la implementación de tecnología de código de barras como solución al problema de control del flujo de materiales en una empresa del sector metalmecánico. El objetivo central fue reducir los tiempos y recursos necesarios para la identificación, acomodo y trazabilidad de la materia prima.
+Plantix es una plataforma digital desarrollada por la empresa alemana PEAT GmbH, especializada en el diagnóstico de enfermedades, plagas y deficiencias nutricionales en cultivos agrícolas mediante inteligencia artificial y visión artificial. La aplicación fue diseñada para apoyar a los agricultores en la identificación temprana de problemas fitosanitarios, permitiendo una intervención oportuna que reduzca las pérdidas en la producción.
 
-La solución incluyó la instalación de escáneres industriales con batería de larga duración, conectores USB para la transmisión de datos y software ERP compatible con los lectores. Tras 120 días de implementación, los resultados fueron concluyentes:
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox[c][5cm][c]{0.85\textwidth}{\centering\textit{[Imagen pendiente]}}}
+    \caption{Interfaz de la aplicación Plantix}
+    \label{fig:1_2_3}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} PEAT GmbH (2025).
+\end{figure}
 
-\begin{itemize}
-    \item Se eliminaron los procedimientos manuales de registro, reduciendo los errores de captura.
-    \item Se logró trazabilidad completa de equipos, productos y mercancías de forma continua.
-    \item Se mejoraron los tiempos de respuesta en el abastecimiento de materia prima a producción.
-    \item Se redujo el tiempo operativo al contar con información exacta sobre existencias y ubicación de materiales.
-\end{itemize}
+El funcionamiento de Plantix se basa en la captura de imágenes de hojas, frutos o tallos utilizando la cámara de un dispositivo móvil. Una vez obtenida la fotografía, el sistema analiza automáticamente la imagen mediante algoritmos de aprendizaje profundo y redes neuronales convolucionales (CNN), los cuales han sido entrenados con miles de imágenes de cultivos afectados por diferentes enfermedades y plagas.
 
-Este proyecto es el antecedente más cercano al presente trabajo, ya que comparte el uso de lectores de código de barras como herramienta de captura de datos. Su experiencia confirma la viabilidad y el impacto positivo de esta tecnología en la gestión de inventarios, incluso en entornos de mayor complejidad que el de una farmacia de pequeña escala.
+Después del procesamiento, la plataforma genera un diagnóstico indicando la posible enfermedad, plaga o deficiencia nutricional detectada. Además, proporciona recomendaciones para el manejo del problema identificado, incluyendo medidas preventivas y correctivas que pueden ser aplicadas por el agricultor.
+
+La aplicación es utilizada en diversos cultivos alrededor del mundo y constituye una de las herramientas comerciales más importantes en el área de agricultura digital. Su capacidad para procesar imágenes en pocos segundos permite realizar diagnósticos rápidos directamente en campo, sin necesidad de equipos especializados o análisis de laboratorio.
+
+Las principales tecnologías empleadas por Plantix incluyen visión artificial, procesamiento digital de imágenes, inteligencia artificial, aprendizaje profundo, redes neuronales convolucionales y computación móvil.
+
+
+\subsection{Taranis}
+
+Taranis es una empresa tecnológica especializada en agricultura de precisión que utiliza inteligencia artificial, visión artificial y análisis avanzado de imágenes para monitorear el estado de los cultivos. La compañía desarrolló una plataforma capaz de detectar de manera temprana enfermedades, plagas, malezas, deficiencias nutricionales y otros factores que pueden afectar la productividad agrícola.
+
+El sistema funciona mediante la captura de imágenes de alta resolución obtenidas por drones, aeronaves y otras plataformas de monitoreo. Estas imágenes son procesadas utilizando algoritmos de inteligencia artificial y aprendizaje automático que analizan cada zona del cultivo para identificar anomalías y generar reportes detallados sobre el estado fitosanitario de las plantas.
+
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox[c][5cm][c]{0.85\textwidth}{\centering\textit{[Imagen pendiente]}}}
+    \caption{Imágenes capturadas por dron en cultivo analizadas por la plataforma Taranis}
+    \label{fig:1_2_4}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} Taranis (2025).
+\end{figure}
+
+Una de las principales ventajas de Taranis es su capacidad para detectar problemas agrícolas en etapas tempranas, permitiendo a los productores actuar antes de que las afectaciones se propaguen a grandes extensiones del cultivo. La plataforma también facilita la generación de mapas de prescripción y recomendaciones para optimizar la aplicación de insumos agrícolas.
+
+La empresa combina múltiples tecnologías como visión computacional, redes neuronales profundas, aprendizaje automático, análisis geoespacial y procesamiento masivo de datos. Gracias a estas herramientas, el sistema puede analizar millones de imágenes y proporcionar información precisa para la toma de decisiones en tiempo real.
+
+
+\subsection{Prospera Technologies}
+
+Prospera Technologies es una empresa de tecnología agrícola especializada en el desarrollo de soluciones de inteligencia artificial y visión artificial para el monitoreo automatizado de cultivos. Fundada en Israel en 2014, la compañía desarrolló plataformas capaces de analizar el crecimiento, la salud y las condiciones de estrés de las plantas mediante la captura y procesamiento continuo de datos visuales y climáticos. En 2021 fue adquirida por Valmont Industries debido al impacto de sus tecnologías en el sector agrícola.
+
+El sistema desarrollado por Prospera emplea cámaras de alta resolución, sensores ambientales y algoritmos de inteligencia artificial para monitorear los cultivos en tiempo real. La plataforma recopila imágenes de las plantas y datos relacionados con las condiciones ambientales, permitiendo detectar anomalías asociadas con enfermedades, plagas, deficiencias nutricionales, problemas de riego y otros factores que afectan el rendimiento agrícola.
+
+Una de las principales características de la solución es el uso de técnicas avanzadas de Machine Learning y Computer Vision, las cuales permiten analizar grandes volúmenes de información y generar alertas tempranas sobre posibles afectaciones en los cultivos. Los resultados del análisis son presentados al agricultor mediante plataformas web y aplicaciones móviles que facilitan la toma de decisiones basada en datos.
+
+La tecnología de Prospera también ha sido utilizada en sistemas de riego inteligente, donde la información obtenida mediante visión artificial se integra con plataformas de agricultura de precisión para optimizar el uso de agua, fertilizantes y otros recursos agrícolas. Estas soluciones han permitido monitorear millones de acres de cultivo y mejorar la eficiencia de las actividades agrícolas mediante decisiones fundamentadas en inteligencia artificial.
+
+Las principales tecnologías utilizadas por la empresa incluyen visión artificial, aprendizaje automático, aprendizaje profundo, sensores IoT, análisis de datos agrícolas y plataformas de monitoreo remoto. La combinación de estas herramientas permite obtener información detallada sobre el estado de los cultivos y actuar de manera preventiva ante posibles problemas fitosanitarios.

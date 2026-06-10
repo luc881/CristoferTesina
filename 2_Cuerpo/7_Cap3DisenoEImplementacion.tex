@@ -1,0 +1,1144 @@
+% =============================================
+% CAPÍTULO 3: DISEÑO E IMPLEMENTACIÓN
+% =============================================
+
+\chapterpage{3}{Diseño e Implementación}
+\clearpage
+\refstepcounter{chapter}
+\addcontentsline{toc}{chapter}{Cap. 3 Diseño e Implementación}
+
+En este capítulo se describe el proceso de diseño e implementación del sistema, desarrollando cada uno de los objetivos específicos del proyecto en el orden en que fueron planteados. Para cada objetivo se presentan las decisiones técnicas tomadas y la justificación que las respalda.
+
+% =============================================
+% SECCIÓN 3.1: DIAGRAMA DE BLOQUES
+% =============================================
+
+\section{Arquitectura general del sistema}
+
+El diagrama de bloques muestra los tres componentes principales del sistema y los canales de comunicación entre ellos: el nodo sensor instalado en la farmacia, el servidor y base de datos alojados en la nube, y la interfaz web accesible desde el navegador. Cada componente corresponde a uno de los objetivos específicos del proyecto y se describe en detalle en las secciones siguientes.
+
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[width=\textwidth]{0_imagenes/DiagramaBloques/DiagramaBloques.png}}
+    \caption{Diagrama de bloques del sistema}
+    \label{fig:cap3-diagrama-bloques}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+El diagrama de casos de uso muestra quiénes interactúan con el sistema y qué funciones tiene disponibles cada uno. Cada caja con encabezado oscuro representa un actor o una función del sistema; las \textbf{líneas sólidas} indican quién tiene acceso a qué; las \textbf{flechas punteadas «extend»} señalan funciones opcionales que amplían una función base; y la \textbf{flecha con triángulo} entre los actores humanos indica que el Administrador hereda todas las funciones del Cajero y añade las propias.
+
+% ═══════════════════════════════════════════════════════════════════════════
+% DIAGRAMA DE CASOS DE USO — cajas UML con encabezado
+% ═══════════════════════════════════════════════════════════════════════════
+\begin{figure}[p]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+  % Caja de caso de uso: encabezado gris claro + cuerpo blanco
+  uc/.style={
+    rectangle split, rectangle split parts=2,
+    rectangle split part fill={gray!30, white},
+    draw=black!65, thick, rounded corners=3pt,
+    minimum width=4.5cm, text width=4.3cm,
+    align=center, font=\small\sffamily, inner sep=4pt
+  },
+  % Caja de actor: encabezado más oscuro
+  act/.style={
+    rectangle split, rectangle split parts=2,
+    rectangle split part fill={gray!60, white},
+    draw=black!70, thick, rounded corners=3pt,
+    minimum width=3.2cm, text width=3.0cm,
+    align=center, font=\small\sffamily, inner sep=4pt
+  },
+  lnk/.style={-, draw=black!50, thick},
+  ext/.style={->, >=Stealth, dashed, draw=black!65, thick},
+  grp/.style={font=\footnotesize\sffamily\itshape, text=black!40}
+]
+
+% Borde del sistema
+\draw[black!70, very thick, rounded corners=6pt]
+  (-5.6, -15.5) rectangle (5.6, 3.8);
+\fill[gray!70] (-5.5, 2.9) rectangle (5.5, 3.75);
+\node[font=\scriptsize\sffamily, text=white] at (0, 3.62) {«system»};
+\node[font=\normalsize\sffamily\bfseries, text=white] at (0, 3.12) {PharmaTrack};
+\draw[black!60, thick] (-5.5, 2.9) -- (5.5, 2.9);
+
+\node[grp] at ( 0,    2.4) {Autenticación};
+\node[grp] at (-2.8, -2.0) {Ventas};
+\node[grp] at ( 2.8, -2.0) {Administración};
+\node[grp] at ( 0,  -12.4) {Monitoreo ambiental};
+
+% Autenticación
+\node[uc] (login) at (-2.0, 1.3) {%
+  \scriptsize\sffamily «use case»%
+  \nodepart{two}Iniciar sesión};
+\node[uc] (logout) at (2.0, 1.3) {%
+  \scriptsize\sffamily «use case»%
+  \nodepart{two}Cerrar sesión};
+\node[uc] (recovery) at (0.0, -0.5) {%
+  \scriptsize\sffamily «use case»%
+  \nodepart{two}Recuperar contraseña};
+
+% Ventas
+\node[uc] (venta) at (-2.8, -3.0) {%
+  \scriptsize\sffamily «use case»%
+  \nodepart{two}Registrar nueva venta};
+\node[uc] (historial) at (-2.8, -5.6) {%
+  \scriptsize\sffamily «use case»%
+  \nodepart{two}Consultar historial de ventas};
+\node[uc] (scanner) at (-2.8, -8.2) {%
+  \scriptsize\sffamily «use case»%
+  \nodepart{two}Escanear código de barras};
+\node[uc] (refund) at (-2.8, -10.8) {%
+  \scriptsize\sffamily «use case»%
+  \nodepart{two}Aplicar devolución};
+
+% Administración
+\node[uc] (catalogo) at (2.8, -3.0) {%
+  \scriptsize\sffamily «use case»%
+  \nodepart{two}Gestionar catálogo de productos};
+\node[uc] (lotes) at (2.8, -5.6) {%
+  \scriptsize\sffamily «use case»%
+  \nodepart{two}Consultar existencias y lotes};
+\node[uc] (compras) at (2.8, -8.2) {%
+  \scriptsize\sffamily «use case»%
+  \nodepart{two}Registrar compra a proveedor};
+\node[uc] (usuarios) at (2.8, -10.8) {%
+  \scriptsize\sffamily «use case»%
+  \nodepart{two}Gestionar usuarios y roles};
+
+% Monitoreo ambiental
+\node[uc] (consulta) at (-1.8, -13.5) {%
+  \scriptsize\sffamily «use case»%
+  \nodepart{two}Consultar monitoreo ambiental};
+\node[uc] (envio) at (1.8, -13.5) {%
+  \scriptsize\sffamily «use case»%
+  \nodepart{two}Enviar datos ambientales};
+
+% Relaciones «extend»
+\draw[ext] (recovery) -- (login)
+  node[midway, above left, font=\scriptsize\sffamily] {«extend»};
+\draw[ext] (scanner.west) to[out=180, in=180, looseness=1.8] (venta.west)
+  node[pos=0.5, left, font=\scriptsize\sffamily] {«extend»};
+\draw[ext] (refund.west) to[out=180, in=180, looseness=1.5] (historial.west)
+  node[pos=0.5, left, font=\scriptsize\sffamily] {«extend»};
+
+% Actores
+\node[act] (cajero) at (-9.2, -2.0) {%
+  \scriptsize\sffamily «actor»%
+  \nodepart{two}\textbf{Cajero}};
+\node[act] (admin) at (-9.2, -8.5) {%
+  \scriptsize\sffamily «actor»%
+  \nodepart{two}\textbf{Administrador}};
+\node[act] (esp32) at (9.2, -13.5) {%
+  \scriptsize\sffamily «actor»%
+  \nodepart{two}\textbf{Sensor ESP32}};
+
+% Generalización: Administrador hereda funciones del Cajero
+\draw[-{Triangle[open, length=8pt, width=10pt]}, thick]
+  (admin.north) -- (cajero.south);
+
+% Asociaciones
+\draw[lnk] (cajero) -- (login);
+\draw[lnk] (cajero) -- (logout);
+\draw[lnk] (cajero) -- (venta);
+\draw[lnk] (cajero) -- (historial);
+\draw[lnk] (cajero) -- (consulta);
+
+\draw[lnk] (admin) -- (catalogo);
+\draw[lnk] (admin) -- (lotes);
+\draw[lnk] (admin) -- (compras);
+\draw[lnk] (admin) -- (usuarios);
+
+\draw[lnk] (esp32) -- (envio);
+
+\end{tikzpicture}
+}%
+\caption{Diagrama de casos de uso del sistema PharmaTrack: tres actores, 13 funciones y relaciones «extend» entre funciones relacionadas}
+\label{fig:cap3-casos-uso}
+\vspace{0.2cm}
+\footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+El \textbf{Cajero} opera el punto de venta: inicia y cierra sesión, registra ventas, consulta el historial y visualiza el sensor. El \textbf{Administrador} hereda todas las funciones del Cajero (flecha con triángulo) y añade las propias: gestión del catálogo, existencias y lotes, compras y usuarios. El \textbf{Sensor ESP32} envía datos de temperatura y humedad automáticamente cada 30 segundos. Las funciones «extend» son opcionales: el escáner puede activarse al registrar una venta; la recuperación de contraseña extiende el inicio de sesión; y la devolución se aplica desde el historial.
+
+% ═══════════════════════════════════════════════════════════════════════════
+% DIAGRAMA DE CLASES — entidades principales del sistema
+% ═══════════════════════════════════════════════════════════════════════════
+El diagrama de clases complementa el anterior mostrando cómo están organizados los datos. Cada caja es una tabla de la base de datos; los atributos son sus campos; y las líneas con números indican cómo se relacionan (\textbf{1} = uno, \textbf{*} = muchos).
+
+\begin{figure}[p]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+  cls/.style={
+    rectangle split, rectangle split parts=3,
+    rectangle split part fill={gray!60, gray!20, white},
+    draw=black!70, thick,
+    minimum width=3.8cm, text width=3.6cm,
+    align=center, font=\scriptsize\sffamily, inner sep=4pt
+  },
+  rel/.style={-, draw=black!55, thick},
+  mul/.style={font=\scriptsize\sffamily, fill=white, inner sep=1pt}
+]
+
+% Fila 1
+\node[cls] (rol) at (-7, 0) {%
+  \color{white}\textbf{«entity»}%
+  \nodepart{two}\textbf{Rol}%
+  \nodepart{three}\raggedright
+  + id: Integer\\+ nombre: String};
+
+\node[cls] (usuario) at (-2.5, 0) {%
+  \color{white}\textbf{«entity»}%
+  \nodepart{two}\textbf{Usuario}%
+  \nodepart{three}\raggedright
+  + id: Integer\\+ nombre: String\\+ email: String\\+ rol\_id: FK};
+
+\node[cls] (lectura) at (5.5, 0) {%
+  \color{white}\textbf{«entity»}%
+  \nodepart{two}\textbf{LecturaSensor}%
+  \nodepart{three}\raggedright
+  + id: Integer\\+ temperatura: Decimal\\+ humedad: Decimal\\+ timestamp: DateTime\\+ device\_id: String};
+
+% Fila 2
+\node[cls] (compra) at (-7, -7) {%
+  \color{white}\textbf{«entity»}%
+  \nodepart{two}\textbf{Compra}%
+  \nodepart{three}\raggedright
+  + id: Integer\\+ fecha: DateTime\\+ total: Decimal\\+ proveedor\_id: FK};
+
+\node[cls] (venta) at (-2.5, -7) {%
+  \color{white}\textbf{«entity»}%
+  \nodepart{two}\textbf{Venta}%
+  \nodepart{three}\raggedright
+  + id: Integer\\+ fecha: DateTime\\+ total: Decimal\\+ estado: Enum\\+ usuario\_id: FK};
+
+\node[cls] (producto) at (2.0, -7) {%
+  \color{white}\textbf{«entity»}%
+  \nodepart{two}\textbf{Producto}%
+  \nodepart{three}\raggedright
+  + id: Integer\\+ nombre: String\\+ precio\_venta: Decimal\\+ categoria\_id: FK};
+
+\node[cls] (lote) at (6.5, -7) {%
+  \color{white}\textbf{«entity»}%
+  \nodepart{two}\textbf{LoteProducto}%
+  \nodepart{three}\raggedright
+  + id: Integer\\+ codigo\_lote: String\\+ fecha\_venc: Date\\+ cantidad: Integer\\+ producto\_id: FK};
+
+% Fila 3
+\node[cls] (proveedor) at (-7, -14) {%
+  \color{white}\textbf{«entity»}%
+  \nodepart{two}\textbf{Proveedor}%
+  \nodepart{three}\raggedright
+  + id: Integer\\+ nombre: String\\+ rfc: String\\+ email: String};
+
+\node[cls] (detalle) at (-2.5, -14) {%
+  \color{white}\textbf{«entity»}%
+  \nodepart{two}\textbf{DetalleVenta}%
+  \nodepart{three}\raggedright
+  + id: Integer\\+ cantidad: Integer\\+ precio\_unit: Decimal\\+ venta\_id: FK};
+
+\node[cls] (uso) at (2.0, -14) {%
+  \color{white}\textbf{«entity»}%
+  \nodepart{two}\textbf{UsoLoteVenta}%
+  \nodepart{three}\raggedright
+  + id: Integer\\+ cantidad\_usada: Integer\\+ detalle\_id: FK\\+ lote\_id: FK};
+
+% Relaciones
+\draw[rel] (rol) -- (usuario)
+  node[mul,near start,above]{1} node[mul,near end,above]{*};
+\draw[rel] (usuario) -- (venta)
+  node[mul,near start,right]{1} node[mul,near end,right]{*};
+\draw[rel] (venta) -- (detalle)
+  node[mul,near start,right]{1} node[mul,near end,right]{*};
+\draw[rel] (detalle) -- (uso)
+  node[mul,near start,right]{1} node[mul,near end,right]{*};
+\draw[rel] (lote) -- (uso)
+  node[mul,near start,below]{1} node[mul,near end,below]{*};
+\draw[rel] (producto) -- (lote)
+  node[mul,near start,above]{1} node[mul,near end,above]{*};
+\draw[rel] (proveedor) -- (compra)
+  node[mul,near start,right]{1} node[mul,near end,right]{*};
+\draw[rel] (compra.east) to[out=0,in=180] (lote.west)
+  node[mul,near start,above]{1} node[mul,near end,above]{*};
+
+\end{tikzpicture}
+}%
+\caption{Diagrama de clases del sistema PharmaTrack: 10 entidades principales. \textit{UsoLoteVenta} registra qué lote exacto se consumió por cada línea de venta, implementando el criterio FEFO (primero en vencer, primero en salir)}
+\label{fig:cap3-clases}
+\vspace{0.2cm}
+\footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+\textbf{Rol} y \textbf{Usuario} gestionan los accesos. \textbf{LecturaSensor} almacena cada medición del ESP32. El flujo principal de una venta va de \textbf{Venta} a \textbf{DetalleVenta} y de ahí a \textbf{UsoLoteVenta}, que registra qué lote específico se descontó del inventario — esto implementa el criterio FEFO. \textbf{Producto} y \textbf{LoteProducto} modelan el inventario; cada producto tiene múltiples lotes con distintas fechas de vencimiento. \textbf{Proveedor} y \textbf{Compra} registran las adquisiciones de mercancía.
+
+La interfaz web es el punto de entrada para el personal de la farmacia. Las figuras siguientes muestran el flujo de navegación completo: inicio de sesión, panel principal, historial de ventas, registro de una venta con lector de código de barras y los módulos adicionales del sistema.
+
+% ═══════════════════════════════════════════════════════════════════════════
+% WIREFLOW — HOJA 1: LOGIN + DASHBOARD
+% [p] = figura en página propia, sin \clearpage previo (evita hoja en blanco)
+% TODO: reemplazar cada \parbox por:
+%   \includegraphics[width=15.8cm,height=7.5cm]{0_imagenes/Cap3/NombreArchivo.png}
+% ═══════════════════════════════════════════════════════════════════════════
+\begin{figure}[p]
+\centering
+\begin{tikzpicture}[
+  screenFull/.style={
+    rectangle split, rectangle split parts=2,
+    rectangle split part fill={gray!25, white},
+    draw=gray!55, thick, rounded corners=4pt,
+    minimum width=16cm, text width=15.8cm,
+    align=center, inner sep=5pt
+  },
+  hubFull/.style={
+    rectangle split, rectangle split parts=2,
+    rectangle split part fill={gray!60, gray!8},
+    draw=black!75, very thick, rounded corners=4pt,
+    minimum width=16cm, text width=15.8cm,
+    align=center, inner sep=5pt
+  },
+  menuItem/.style={
+    draw=gray!55, fill=gray!12, rounded corners=3pt,
+    font=\footnotesize\sffamily, inner sep=4pt, minimum width=2.2cm,
+    align=center
+  },
+  mainArrow/.style={->, >=Stealth, line width=1.5pt, draw=black!65},
+  navArrow/.style={->, >=Stealth, line width=0.9pt, draw=gray!60, dashed},
+  lbl/.style={font=\footnotesize\sffamily, text=black!60, fill=white, inner sep=2pt}
+]
+
+% ── 1. Inicio de sesión (ancho completo) ─────────────────────────────
+% TODO: \includegraphics[width=15.8cm,height=7.5cm]{0_imagenes/Cap3/Login.png}
+\node[screenFull] (login) at (0, 0) {%
+  \textbf{\small Inicio de sesión}%
+  \nodepart{two}%
+  \parbox[c][7.5cm][c]{15.8cm}{\centering\textcolor{gray!50}{\normalsize\itshape [Login.png]}}%
+};
+
+% Flecha de transición hacia abajo
+\draw[mainArrow] (login.south) -- ++(0,-0.7)
+  node[lbl, right, midway] {acceso exitoso};
+
+% ── 2. Dashboard (ancho completo, hub principal) ──────────────────────
+% TODO: \includegraphics[width=15.8cm,height=7.5cm]{0_imagenes/Cap3/Dashboard.png}
+\node[hubFull] (dashboard) at (0, -10) {%
+  \textbf{\small Dashboard}%
+  \nodepart{two}%
+  \parbox[c][7.5cm][c]{15.8cm}{\centering\textcolor{gray!55}{\normalsize\itshape [Dashboard.png]}}%
+};
+
+% ── Menú lateral: flechas desde Dashboard hacia módulos ───────────────
+\coordinate (bifur) at ($(dashboard.south) + (0, -0.6)$);
+\draw[navArrow] (dashboard.south) -- (bifur);
+\node[font=\footnotesize\itshape, text=gray!55, anchor=west]
+  at ($(bifur) + (0.3, -0.35)$) {menú lateral};
+
+\node[menuItem] (mVentas)     at (-6.5, -16.5) {Ventas};
+\node[menuItem] (mInventario) at (-3.25,-16.5) {Inventario};
+\node[menuItem] (mCompras)    at ( 0.0, -16.5) {Compras};
+\node[menuItem] (mSensor)     at ( 3.25,-16.5) {Sensor};
+\node[menuItem] (mUsuarios)   at ( 6.5, -16.5) {Usuarios};
+
+\draw[navArrow] (bifur) -- (mVentas.north);
+\draw[navArrow] (bifur) -- (mInventario.north);
+\draw[navArrow] (bifur) -- (mCompras.north);
+\draw[navArrow] (bifur) -- (mSensor.north);
+\draw[navArrow] (bifur) -- (mUsuarios.north);
+
+\end{tikzpicture}
+\caption{Inicio de sesión y panel principal: el acceso exitoso dirige al Dashboard, desde cuyo menú lateral es posible navegar a cualquier módulo del sistema}
+\label{fig:cap3-wireflow-login}
+\vspace{0.2cm}
+\footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+% ═══════════════════════════════════════════════════════════════════════════
+% WIREFLOW — HOJA 2: LISTA DE VENTAS + NUEVA VENTA
+% TODO: reemplazar cada \parbox por:
+%   \includegraphics[width=15.8cm,height=7.5cm]{0_imagenes/Cap3/NombreArchivo.png}
+% ═══════════════════════════════════════════════════════════════════════════
+\begin{figure}[p]
+\centering
+\begin{tikzpicture}[
+  screenFull/.style={
+    rectangle split, rectangle split parts=2,
+    rectangle split part fill={gray!25, white},
+    draw=gray!55, thick, rounded corners=4pt,
+    minimum width=16cm, text width=15.8cm,
+    align=center, inner sep=5pt
+  },
+  mainArrow/.style={->, >=Stealth, line width=1.5pt, draw=black!65},
+  lbl/.style={font=\footnotesize\sffamily, text=black!60, fill=white, inner sep=2pt}
+]
+
+\node[font=\footnotesize\itshape, text=gray!55, align=center]
+  at (0, 1.2) {Dashboard\,→\,Ventas (Fig.~\ref{fig:cap3-wireflow-login})};
+
+% ── 3. Lista de ventas ───────────────────────────────────────────────
+% TODO: \includegraphics[width=15.8cm,height=7.5cm]{0_imagenes/Cap3/ListaVentas.png}
+\node[screenFull] (listaventas) at (0, 0) {%
+  \textbf{\small Historial de ventas}%
+  \nodepart{two}%
+  \parbox[c][7.5cm][c]{15.8cm}{\centering\textcolor{gray!50}{\normalsize\itshape [ListaVentas.png]}}%
+};
+
+\draw[mainArrow] (listaventas.south) -- ++(0,-0.7)
+  node[lbl, right, midway] {nueva venta};
+
+% ── 4. Formulario de nueva venta ─────────────────────────────────────
+% TODO: \includegraphics[width=15.8cm,height=7.5cm]{0_imagenes/Cap3/NuevaVenta.png}
+\node[screenFull] (ventas) at (0, -10) {%
+  \textbf{\small Formulario de nueva venta}%
+  \nodepart{two}%
+  \parbox[c][7.5cm][c]{15.8cm}{\centering\textcolor{gray!50}{\normalsize\itshape [NuevaVenta.png]}}%
+};
+
+\end{tikzpicture}
+\caption{Módulo de ventas: el historial muestra todas las transacciones registradas; desde ahí se accede al formulario de nueva venta donde se registran los productos y el método de pago}
+\label{fig:cap3-wireflow-ventas}
+\vspace{0.2cm}
+\footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+% ═══════════════════════════════════════════════════════════════════════════
+% WIREFLOW — HOJA 3: MODO LECTOR + VENTA REGISTRADA
+% TODO: reemplazar cada \parbox por:
+%   \includegraphics[width=15.8cm,height=7.5cm]{0_imagenes/Cap3/NombreArchivo.png}
+% ═══════════════════════════════════════════════════════════════════════════
+\begin{figure}[p]
+\centering
+\begin{tikzpicture}[
+  screenFull/.style={
+    rectangle split, rectangle split parts=2,
+    rectangle split part fill={gray!25, white},
+    draw=gray!55, thick, rounded corners=4pt,
+    minimum width=16cm, text width=15.8cm,
+    align=center, inner sep=5pt
+  },
+  mainArrow/.style={->, >=Stealth, line width=1.5pt, draw=black!65},
+  lbl/.style={font=\footnotesize\sffamily, text=black!60, fill=white, inner sep=2pt}
+]
+
+\node[font=\footnotesize\itshape, text=gray!55, align=center]
+  at (0, 1.2) {Nueva venta\,→\,tecla F2 activa el lector (Fig.~\ref{fig:cap3-wireflow-ventas})};
+
+% ── 5. Modo lector activo (F2) ───────────────────────────────────────
+% TODO: \includegraphics[width=15.8cm,height=7.5cm]{0_imagenes/Cap3/ModoLector.png}
+\node[screenFull] (lector) at (0, 0) {%
+  \textbf{\small Modo lector de código de barras (F2)}%
+  \nodepart{two}%
+  \parbox[c][7.5cm][c]{15.8cm}{\centering\textcolor{gray!50}{\normalsize\itshape [ModoLector.png]}}%
+};
+
+\draw[mainArrow] (lector.south) -- ++(0,-0.7)
+  node[lbl, right, midway] {confirmar venta};
+
+% ── 6. Venta registrada ──────────────────────────────────────────────
+% TODO: \includegraphics[width=15.8cm,height=7.5cm]{0_imagenes/Cap3/VentaDetalle.png}
+\node[screenFull] (ventaok) at (0, -10) {%
+  \textbf{\small Venta registrada}%
+  \nodepart{two}%
+  \parbox[c][7.5cm][c]{15.8cm}{\centering\textcolor{gray!50}{\normalsize\itshape [VentaDetalle.png]}}%
+};
+
+\end{tikzpicture}
+\caption{Registro de venta con lector: la tecla F2 activa el modo escáner, que redirige el foco al campo de código de barras; al confirmar la venta el sistema genera el comprobante y descuenta el inventario automáticamente}
+\label{fig:cap3-wireflow-lector}
+\vspace{0.2cm}
+\footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+% ═══════════════════════════════════════════════════════════════════════════
+% WIREFLOW — HOJA 4: MÓDULOS ADICIONALES (4 en rejilla 2×2)
+% TODO: reemplazar cada \parbox por:
+%   \includegraphics[width=7.3cm,height=7cm]{0_imagenes/Cap3/NombreArchivo.png}
+% ═══════════════════════════════════════════════════════════════════════════
+\begin{figure}[p]
+\centering
+\begin{tikzpicture}[
+  screenMd/.style={
+    rectangle split, rectangle split parts=2,
+    rectangle split part fill={gray!25, white},
+    draw=gray!55, thick, rounded corners=4pt,
+    minimum width=7.5cm, text width=7.3cm,
+    align=center, inner sep=5pt
+  }
+]
+
+\node[font=\small\itshape, text=gray!60, text width=16cm, align=center]
+  at (5.0, 1.3)
+  {Módulos accesibles desde el menú lateral del Dashboard (Fig.~\ref{fig:cap3-wireflow-login}):};
+
+% 7. Inventario
+% TODO: \includegraphics[width=7.3cm,height=7cm]{0_imagenes/Cap3/Inventario.png}
+\node[screenMd] at (0, 0) {%
+  \textbf{\small Inventario}%
+  \nodepart{two}%
+  \parbox[c][7cm][c]{7.3cm}{\centering\textcolor{gray!50}{\normalsize\itshape [Inventario.png]}}%
+};
+
+% 8. Compras
+% TODO: \includegraphics[width=7.3cm,height=7cm]{0_imagenes/Cap3/Compras.png}
+\node[screenMd] at (10, 0) {%
+  \textbf{\small Compras}%
+  \nodepart{two}%
+  \parbox[c][7cm][c]{7.3cm}{\centering\textcolor{gray!50}{\normalsize\itshape [Compras.png]}}%
+};
+
+% 9. Usuarios y roles
+% TODO: \includegraphics[width=7.3cm,height=7cm]{0_imagenes/Cap3/Usuarios.png}
+\node[screenMd] at (0, -9.5) {%
+  \textbf{\small Usuarios y roles}%
+  \nodepart{two}%
+  \parbox[c][7cm][c]{7.3cm}{\centering\textcolor{gray!50}{\normalsize\itshape [Usuarios.png]}}%
+};
+
+% 10. Sensor ambiental
+% TODO: \includegraphics[width=7.3cm,height=7cm]{0_imagenes/Cap3/Sensor.png}
+\node[screenMd] at (10, -9.5) {%
+  \textbf{\small Sensor ambiental}%
+  \nodepart{two}%
+  \parbox[c][7cm][c]{7.3cm}{\centering\textcolor{gray!50}{\normalsize\itshape [Sensor.png]}}%
+};
+
+\end{tikzpicture}
+\caption{Módulos adicionales del sistema: inventario de productos y lotes, registro de compras a proveedores, gestión de usuarios y roles, y monitoreo ambiental del sensor}
+\label{fig:cap3-wireflow-modulos}
+\vspace{0.2cm}
+\footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+\clearpage
+
+% =============================================
+% OE 1: BASE DE DATOS
+% =============================================
+
+\section{Desarrollo de la base de datos en PostgreSQL}
+
+Para cumplir con el primer objetivo específico se diseñó e implementó una base de datos relacional en PostgreSQL que centraliza toda la información del sistema: productos, lotes de inventario, usuarios, ventas y mediciones ambientales. Una base de datos relacional organiza la información en tablas vinculadas entre sí mediante referencias, lo que permite consultar datos relacionados de forma eficiente y mantener la consistencia de la información. El esquema resultante comprende \textbf{22 tablas} agrupadas en cinco módulos funcionales.
+
+\subsection{Selección de PostgreSQL}
+
+  Se eligió PostgreSQL como sistema gestor de base de datos por ser la opción
+  recomendada por los ecosistemas de las herramientas utilizadas en este proyecto
+  y por su amplia adopción en el desarrollo de aplicaciones
+  web profesionales. Frente a alternativas como MySQL o SQLite, ofrece una ventaja
+  concreta para este sistema.
+  
+  Esta es, el tipo de dato \textbf{NUMERIC}, que almacena cantidades monetarias
+  con precisión exacta, sin los errores de redondeo que presentan los tipos de punto
+  flotante al acumular operaciones. En un sistema que calcula totales de ventas y
+  maneja precios con decimales, esta precisión es necesaria para garantizar que los
+  montos registrados sean exactos.
+
+\subsection{Organización modular del esquema}
+
+Las 22 tablas se dividieron en cinco módulos según el área del negocio que gestionan, de modo que cada módulo tenga una responsabilidad clara y las dependencias entre módulos sean explícitas:
+
+\begin{enumerate}[nosep, itemsep=3pt]
+    \item \textbf{Autenticación y control de acceso:} usuarios, roles y permisos.
+    \item \textbf{Catálogo de productos:} información de los medicamentos y sus características.
+    \item \textbf{Inventario y compras:} lotes, fechas de caducidad y órdenes de abastecimiento.
+    \item \textbf{Registro de ventas:} transacciones, pagos y devoluciones.
+    \item \textbf{Mediciones del sensor:} lecturas de temperatura y humedad.
+\end{enumerate}
+
+Esta separación hace que las tablas de un módulo puedan crecer o modificarse sin impactar innecesariamente a los demás, y permite localizar con facilidad qué parte del esquema es responsable de cada tipo de dato.
+
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[width=1\textwidth]{0_imagenes/Cap3/DiagramaGeneral.png}}
+    \caption{Organización modular de la base de datos y dependencias entre módulos}
+    \label{fig:cap3-bd-modulos}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+\clearpage
+\subsection{Módulo 1: Autenticación y control de acceso}
+
+Este módulo agrupa las cinco tablas relacionadas con el acceso al sistema: usuarios, roles, permisos, la relación entre roles y permisos, y sucursales.
+
+El control de acceso se estructuró por roles: cada usuario pertenece a un rol —por ejemplo, \textit{administrador} o \textit{cajero}— y el rol define qué operaciones puede realizar. Esto simplifica la administración: cambiar los privilegios de un grupo de usuarios requiere modificar únicamente el rol, no cada cuenta individualmente.
+
+Para los registros que no deben eliminarse permanentemente —usuarios, roles y sucursales— se optó por conservar el registro en la base de datos y anotar la fecha de baja en una columna adicional. Esto es necesario porque el historial de ventas referencia al usuario que realizó cada transacción; eliminar físicamente ese registro rompería esa relación.
+
+% -------------------------------------------------------
+% DIAGRAMA 1 — Módulo de Autenticación y Control de Acceso
+% Guardar la imagen generada en dbdiagram.io como:
+%   0_imagenes/Cap3/DiagramaAuth.png
+% y descomentar el bloque siguiente:
+% -------------------------------------------------------
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[width=0.8\textwidth]{0_imagenes/Cap3/DiagramaAuth.png}}
+    \caption{Diagrama relacional del módulo de autenticación y control de acceso}
+    \label{fig:cap3-diagrama-auth}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+\clearpage
+\subsection{Módulo 2: Catálogo de productos}
+
+Este módulo gestiona la información de los medicamentos a través de seis tablas: el catálogo general de productos, los medicamentos genéricos, las categorías, las marcas, los ingredientes activos y la relación entre productos e ingredientes.
+
+Se separó el medicamento genérico de sus presentaciones comerciales. Por ejemplo, \textit{Paracetamol} existe como un único registro genérico, y cada presentación concreta —\textit{Paracetamol 500~mg tabletas}, \textit{Paracetamol suspensión 250~mg/5~ml}— es un registro distinto que apunta a ese genérico. Esto evita repetir el nombre del principio activo en cada presentación y permite agrupar reportes por nombre genérico sin trabajo adicional.
+
+Las categorías se organizan en una jerarquía de niveles: una categoría puede contener subcategorías, y estas pueden contener otras más específicas (\textit{Medicamentos} → \textit{Analgésicos} → \textit{Antiinflamatorios}). Todo esto se almacena en una sola tabla, sin límite fijo de profundidad.
+
+La relación entre productos e ingredientes activos se registra con la cantidad y unidad de medida de cada componente. Guardar esta información en la base de datos —no solo en la etiqueta física— permite buscar o filtrar medicamentos por principio activo directamente desde la aplicación.
+
+% -------------------------------------------------------
+% DIAGRAMA 2 — Módulo de Catálogo de Productos
+% Guardar como: 0_imagenes/Cap3/DiagramaCatalogo.png
+% -------------------------------------------------------
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[width=0.8\textwidth]{0_imagenes/Cap3/DiagramaCatalogo.png}}
+    \caption{Diagrama relacional del módulo de catálogo de productos}
+    \label{fig:cap3-diagrama-catalogo}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+\clearpage
+\subsection{Módulo 3: Inventario y compras}
+
+Este módulo controla las existencias físicas y el abastecimiento. Sus tablas registran los lotes de cada producto, los proveedores y las órdenes de compra con el detalle de cada línea.
+
+El inventario se gestiona a nivel de \textbf{lote}, no solo por producto. Cada lote tiene su propio código, fecha de caducidad y cantidad disponible. Esto es necesario en una farmacia porque las regulaciones de buenas prácticas de almacenamiento establecen que los medicamentos deben despacharse en orden de caducidad: primero los lotes que vencen antes. Sin este desglose por lote, el sistema sabría cuántas unidades hay de un producto, pero no podría determinar cuál lote se está consumiendo en cada venta.
+
+Se identificó durante el análisis una situación concreta: algunos medicamentos ingresan a la farmacia sin número de lote asignado por el fabricante. Para no bloquear ese registro, la restricción de unicidad sobre el código de lote se configuró de forma que aplique solo cuando el código existe —si no hay código, se permiten múltiples entradas del mismo producto sin conflicto. Cuando sí hay código, no se permite duplicarlo para el mismo producto, previniendo registros erróneos.
+
+% -------------------------------------------------------
+% DIAGRAMA 3 — Módulo de Inventario y Compras
+% Guardar como: 0_imagenes/Cap3/DiagramaInventario.png
+% -------------------------------------------------------
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[width=0.8\textwidth]{0_imagenes/Cap3/DiagramaInventario.png}}
+    \caption{Diagrama relacional del módulo de inventario y compras}
+    \label{fig:cap3-diagrama-inventario}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+\clearpage
+\subsection{Módulo 4: Registro de ventas}
+
+Este módulo registra las transacciones comerciales a través de cinco tablas: la venta en sí, el detalle de productos incluidos, el vínculo con los lotes descontados, los pagos y las devoluciones.
+
+Cada venta se divide en dos niveles: un encabezado con los datos generales de la transacción —empleado, sucursal, descuento y total— y líneas de detalle con cada producto, su cantidad y precio unitario. Esta separación permite que una sola venta contenga múltiples productos sin repetir los datos generales en cada línea.
+
+Adicionalmente, cada línea de detalle queda vinculada al lote específico del que se descontaron las unidades. Esto permite rastrear, dado un lote, en qué ventas fue despachado. En el contexto farmacéutico es relevante ante un retiro de mercado: el sistema puede identificar exactamente qué ventas contienen el lote afectado.
+
+La venta puede encontrarse en uno de tres estados: en progreso, completada o cancelada. El descuento del inventario ocurre únicamente al confirmar la transacción, no antes. Esto evita que una venta que no se concreta descuente existencias.
+
+Los pagos se registran en una tabla separada para soportar el cobro con más de un método: una transacción puede liquidarse parte en efectivo y parte con tarjeta, registrando cada pago de forma independiente.
+
+% -------------------------------------------------------
+% DIAGRAMA 4 — Módulo de Registro de Ventas
+% Guardar como: 0_imagenes/Cap3/DiagramaVentas.png
+% -------------------------------------------------------
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[width=\textwidth]{0_imagenes/Cap3/DiagramaVentas.png}}
+    \caption{Diagrama relacional del módulo de registro de ventas}
+    \label{fig:cap3-diagrama-ventas}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+\clearpage
+\subsection{Módulo 5: Mediciones del sensor}
+
+Este módulo comprende una sola tabla que almacena cada medición enviada por el nodo electrónico: la temperatura, la humedad, la fecha y hora del registro, y un identificador del dispositivo que la envió.
+
+El identificador se definió como un texto simple en lugar de crear una tabla de dispositivos aparte, ya que el sistema opera con un único nodo sensor. Agregar esa tabla representaría complejidad sin beneficio inmediato; el identificador como texto es suficiente para distinguir nodos adicionales en el futuro sin necesidad de modificar el esquema.
+
+% TODO: subir 0_imagenes/Cap3/DiagramaSensor.png a Overleaf para descomentar
+%\begin{figure}[H]
+%    \centering
+%    \fbox{\includegraphics[width=1\textwidth]{0_imagenes/Cap3/DiagramaSensor.png}}
+%    \caption{Diagrama relacional del módulo de mediciones del sensor}
+%    \label{fig:cap3-diagrama-sensor}
+%    \vspace{0.2cm}
+%    \footnotesize \textbf{Fuente:} Elaboración propia.
+%\end{figure}
+
+Con esta estructura, el esquema cubre la totalidad de las entidades descritas en el objetivo: el módulo de autenticación gestiona los usuarios y el control de acceso, el catálogo y el inventario cubren los productos y sus niveles de existencia por lote, el módulo de ventas registra las transacciones comerciales y su trazabilidad, y el módulo de sensor almacena las mediciones ambientales del nodo electrónico.
+
+
+
+
+% =============================================
+% OE 2: API REST
+% =============================================
+
+\clearpage
+\section{Desarrollo de la API REST con FastAPI}
+
+Para cumplir con el segundo objetivo específico se diseñó e implementó una API REST en Python con el \textit{framework} FastAPI. La API actúa como intermediario entre los clientes y la base de datos: recibe peticiones, las procesa y devuelve la información en un formato que ambos clientes pueden interpretar. El resultado expone operaciones para gestionar inventario, ventas, usuarios, compras y lecturas del sensor, organizadas en 23 grupos de rutas.
+
+\subsection{Selección de FastAPI}
+
+Se eligió FastAPI sobre alternativas como Flask o Django por dos razones concretas.
+
+La primera es que verifica automáticamente que los datos que llegan en cada petición sean correctos antes de procesarlos. Si algo no cumple lo esperado, rechaza la petición con un mensaje descriptivo sin necesidad de escribir ese código de validación manualmente.
+
+La segunda es que genera automáticamente una página de documentación interactiva donde se puede ver cada operación disponible, sus parámetros y las posibles respuestas. Esto permitió verificar el funcionamiento de la API directamente desde el navegador durante el desarrollo, sin herramientas adicionales.
+
+\subsection{Arquitectura en capas}
+
+La API funciona como una serie de filtros por los que pasa cada petición antes de poder interactuar con la base de datos. Se separó en filtros distintos porque cada uno tiene una responsabilidad diferente: si en algún momento cambia una regla de seguridad o una validación del negocio, solo se modifica ese filtro sin tocar el resto.
+
+El primer filtro actúa como un enrutador: dependiendo de la dirección de la petición, determina a qué operación corresponde y la redirige al área correspondiente, de forma similar a como un router de red decide por qué camino enviar el tráfico. El segundo filtro verifica que el usuario esté identificado y que tenga permiso para realizar esa operación; si no cumple alguna de las dos condiciones, la petición es rechazada sin continuar. El tercero aplica las reglas del negocio, como confirmar que hay existencias suficientes antes de registrar una venta. El último ejecuta la operación sobre la base de datos y devuelve el resultado al cliente.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=0.7cm,
+    box/.style={rectangle, draw, rounded corners=4pt, minimum width=6.8cm, minimum height=0.90cm, align=center, font=\small},
+    err/.style={rectangle, draw, fill=gray!20, minimum width=2.8cm, minimum height=0.90cm, align=center, font=\footnotesize, text width=2.6cm},
+    arr/.style={-{Stealth}, thick}
+]
+\node[box, fill=gray!20] (client) {Cliente HTTP \quad (navegador / nodo sensor)};
+\node[box, fill=gray!5,  below=0.8cm of client] (f1) {\textbf{Filtro 1 — Enrutador:} dirige la petición};
+\node[box, fill=gray!10, below=0.8cm of f1]     (f2) {\textbf{Filtro 2 — Seguridad:} verifica identidad y permisos del usuario};
+\node[box, fill=gray!5,  below=0.8cm of f2]     (f3) {\textbf{Filtro 3 — Reglas del negocio:} valida condiciones de la operación};
+\node[box, fill=gray!20, below=0.8cm of f3]     (db) {Base de datos — ejecuta la operación y devuelve el resultado};
+\node[err, right=3.5cm of f1] (err1) {Ruta no\\ encontrada};
+\node[err, right=1.0cm of f2] (err2) {Acceso\\ denegado};
+\node[err, right=1.0cm of f3] (err3) {Operación\\ no permitida};
+% Flujo principal (petición hacia abajo)
+\draw[arr] (client.south) -- node[right, font=\footnotesize]{petición} (f1.north);
+\draw[arr] (f1.south) -- node[left, font=\footnotesize]{Sí} (f2.north);
+\draw[arr] (f2.south) -- node[left, font=\footnotesize]{Sí} (f3.north);
+\draw[arr] (f3.south) -- node[left, font=\footnotesize]{Sí} (db.north);
+% Ramas de error (No)
+\draw[arr] (f1.east) -- node[above, font=\footnotesize]{No} (err1.west);
+\draw[arr] (f2.east) -- node[above, font=\footnotesize]{No} (err2.west);
+\draw[arr] (f3.east) -- node[above, font=\footnotesize]{No} (err3.west);
+% Carril derecho: respuestas de error de vuelta al cliente
+\coordinate (rail) at ($(err1.east)+(0.5,0)$);
+\draw (err1.east) -- (err1.east -| rail);
+\draw (err2.east) -- (err2.east -| rail);
+\draw (err3.east) -- (err3.east -| rail);
+\draw[arr] (err3.east -| rail) -- (client.east -| rail) -- node[above, font=\footnotesize]{respuesta de error} (client.east);
+% Carril izquierdo: respuesta exitosa de vuelta al cliente
+\coordinate (lrail) at ($(db.west)+(-0.5,0)$);
+\draw[arr] (db.west) -- ([xshift=-1cm]db.west -| lrail) -- ([xshift=-1cm]client.west -| lrail) -- node[above, font=\footnotesize]{respuesta exitosa} (client.west);
+\end{tikzpicture}
+\caption{Secuencia de filtros de la API REST}
+\label{fig:cap3-api-capas}
+\vspace{0.2cm}
+\footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+\subsection{Modelos ORM con SQLAlchemy}
+
+Para interactuar con la base de datos desde el código Python, cada tabla del esquema descrito en el OE1 se representa como una clase. Esto permite trabajar con objetos en lugar de instrucciones SQL escritas manualmente, y centraliza la definición del esquema en un único lugar: cualquier modificación —agregar una columna, renombrar un campo— se aplica una sola vez y se refleja en toda la aplicación.
+
+\newpage
+
+\subsection{Esquemas de validación con Pydantic}
+
+Cada operación de la API define un contrato: qué información acepta cuando el cliente envía datos, qué campos son obligatorios y qué estructura tiene la respuesta. Si una petición no cumple ese contrato —un precio negativo, un campo requerido ausente— se rechaza antes de llegar a la lógica de la aplicación, sin código de validación manual adicional.
+
+
+\subsection{Autenticación y autorización}
+
+El acceso al sistema se controla en dos pasos. El primero es la \textbf{autenticación}: al iniciar sesión, la API verifica la contraseña y, si es correcta, emite un \textbf{token de sesión} con vigencia de 30 minutos que contiene el identificador del usuario y sus permisos. Este token acompaña cada petición posterior; el servidor lo verifica sin consultar la base de datos, ya que la información necesaria está incluida y firmada dentro del propio token. Cuando expira, se renueva de forma automática sin que el usuario tenga que ingresar su contraseña de nuevo.
+
+El segundo paso es la \textbf{autorización}: cada operación de la API declara qué permiso requiere para ejecutarse. Antes de procesar la petición, la API verifica que el token del usuario incluya ese permiso; si no lo tiene, la petición es rechazada. Esto conecta con la estructura de roles del OE1: un cajero puede registrar ventas pero no modificar usuarios ni configurar sucursales.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=0.5cm,
+    box/.style={rectangle, draw, rounded corners=3pt, minimum width=7.2cm, minimum height=0.82cm, align=center, font=\small},
+    dec/.style={diamond, draw, aspect=2.8, align=center, font=\small, inner sep=2pt},
+    err/.style={rectangle, draw, fill=gray!20, minimum width=3.2cm, minimum height=0.82cm, align=center, font=\footnotesize, text width=3.0cm},
+    arr/.style={-{Stealth}, thick}
+]
+\node[box, fill=gray!15] (login)   {\textbf{1.} El usuario ingresa su nombre de usuario y contraseña};
+\node[box, fill=gray!5,  below=0.6cm of login]   (verify)  {\textbf{2.} La API verifica que la contraseña sea correcta};
+\node[dec,               below=0.6cm of verify]  (valid)   {¿Contraseña correcta?};
+\node[box, fill=gray!10, below=0.6cm of valid]   (tokens)  {\textbf{3.} Se emite un token de sesión (válido por 30 minutos)};
+\node[box, fill=gray!5,  below=0.6cm of tokens]  (request) {\textbf{4.} El cliente incluye el token en cada petición};
+\node[dec,               below=0.6cm of request] (tokval)  {¿Sesión activa y con permiso?};
+\node[box, fill=gray!10, below=0.6cm of tokval]  (exec)    {\textbf{5.} Se ejecuta la operación y se devuelve el resultado};
+\node[err, right=2.5cm of valid]  (err1) {Acceso denegado:\\ contraseña incorrecta};
+\node[err, right=1.5cm of tokval] (err2) {Acceso denegado:\\ sesión inválida o sin permiso};
+\draw[arr] (login)   -- (verify);
+\draw[arr] (verify)  -- (valid);
+\draw[arr] (valid)   -- node[left, font=\footnotesize]{Sí} (tokens);
+\draw[arr] (valid)   -- node[above, font=\footnotesize]{No} (err1);
+\draw[arr] (tokens)  -- (request);
+\draw[arr] (request) -- (tokval);
+\draw[arr] (tokval)  -- node[left, font=\footnotesize]{Sí} (exec);
+\draw[arr] (tokval)  -- node[above, font=\footnotesize]{No} (err2);
+% Carril derecho de reintento → vuelven al paso 1
+\coordinate (rrail)  at ($(err2.east)+(0.5,  0)$);
+\coordinate (rrail2) at ($(err2.east)+(0.68, 0)$);
+\draw[arr] (err1.east) -- (err1.east -| rrail)
+    -- node[right, font=\footnotesize]{Reintentar} (rrail |- login.east) -- (login.east);
+\draw[arr] (err2.east) -- ([xshift=2cm]err2.east -| rrail2)
+    -- ([xshift=2cm]rrail2 |- login.east) -- (login.east);
+\end{tikzpicture}
+\caption{Diagrama de flujo de autenticación y autorización}
+\label{fig:cap3-jwt-flujo}
+\vspace{0.2cm}
+\footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+\newpage
+\subsection{Endpoints por módulo}
+
+Los 23 grupos de rutas de la API se organizan en seis áreas funcionales que corresponden a los módulos del sistema. La siguiente tabla resume cada área y sus operaciones principales:
+
+\begin{table}[H]
+\centering
+\caption{Agrupación de endpoints de la API REST por área funcional}
+\label{tab:cap3-endpoints}
+\begin{spacing}{1.0}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{@{}l >{\raggedright}p{3.8cm} X@{}}
+\toprule
+\textbf{Área} & \textbf{Módulos} & \textbf{Operaciones principales} \\
+\midrule
+Autenticación      & \texttt{auth}                                                             & Login, emisión y renovación de tokens, cierre de sesión, restablecimiento de contraseña \\[4pt]
+Usuarios y acceso  & \texttt{users, roles, permissions, branches}                              & CRUD de usuarios, asignación de roles, gestión de permisos y sucursales \\[4pt]
+Catálogo           & \texttt{products, product\_master, categories, brands, ingredients}        & CRUD de medicamentos, jerarquía de categorías, ingredientes activos \\[4pt]
+Inventario         & \texttt{product\_batch, suppliers, purchases, purchase\_details}           & Registro de lotes con fechas de caducidad, órdenes de compra \\[4pt]
+Ventas             & \texttt{sales, sale\_details, sale\_payments, sale\_batch\_usage, refunds} & Registro de ventas con descuento FEFO, pagos divididos, devoluciones \\[4pt]
+Monitoreo          & \texttt{sensor\_readings, dashboard, stats, calendar}                     & Lecturas del sensor, indicadores del negocio, estadísticas \\
+\bottomrule
+\end{tabularx}
+\end{spacing}
+\vspace{0.2cm}
+\footnotesize \textbf{Fuente:} Elaboración propia.
+\end{table}
+
+Las operaciones siguen las convenciones REST: consulta, creación, actualización y eliminación. Los recursos que no deben borrarse permanentemente —usuarios, roles, sucursales— aplican borrado lógico, como se describió en el OE1.
+
+\subsection{Despliegue en Railway}
+
+La API se desplegó en \textbf{Railway}, una plataforma en la nube que aloja tanto el servidor como la base de datos PostgreSQL en el mismo entorno. Se evaluaron otras opciones como AWS o servidores dedicados, pero resultaban sobredimensionadas para un sistema con una sola instalación activa: Railway ofrece los mismos componentes esenciales a un costo significativamente menor y sin la complejidad de configuración que implica una infraestructura de mayor escala. Cada vez que se publica una nueva versión del código, el despliegue se actualiza de forma automática.
+
+
+
+% =============================================
+% OE 3: FRONTEND REACT
+% =============================================
+
+\clearpage
+\section{Desarrollo de la interfaz web con React}
+
+Para cumplir con el tercer objetivo específico se diseñó e implementó una interfaz de usuario accesible desde el navegador web, organizada en \textbf{dieciséis módulos de navegación} y respaldada por una biblioteca de componentes visuales reutilizables. La interfaz se comunica con la API del OE2 para consultar y registrar información, y está desplegada en la plataforma Vercel.
+
+\subsection{Selección de React y Vite}
+
+Se eligió \textbf{React} porque su modelo de componentes reutilizables se ajustaba directamente al diseño de la aplicación: la estructura de lista con buscador y filtros, el formulario de creación y el diálogo de confirmación se repiten en prácticamente todos los módulos, lo que permite definirlos una sola vez y usarlos en cualquier vista sin reescribir código. Para el entorno de desarrollo se utilizó \textbf{Vite}, que reduce el tiempo entre guardar un cambio y verlo en pantalla al servir los archivos directamente al navegador sin reempaquetar todo el proyecto en cada modificación.
+
+\subsection{Estructura e interfaz de la aplicación}
+
+La aplicación se divide en tres niveles: \textbf{páginas} (punto de entrada de cada ruta), \textbf{secciones} (lógica y disposición de cada módulo de negocio) y \textbf{componentes} (bloques visuales reutilizables). El enrutamiento entre vistas se gestiona con React Router, que mapea cada URL a su vista sin recargar el servidor. Para el diseño visual se utilizó \textbf{Material-UI} (MUI), una biblioteca de componentes prediseñados —tablas paginadas, formularios, diálogos, selectores de fecha— que garantiza consistencia visual en toda la aplicación y evita desarrollar esos elementos desde cero.
+
+La figura siguiente muestra la disposición de la interfaz: una barra lateral persistente agrupa los módulos por área funcional, y el área de contenido presenta en todos los módulos la misma estructura de componentes reutilizables.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[font=\small]
+
+% Marco exterior (ventana del navegador)
+\draw[thick, rounded corners=3pt] (0, 0) rectangle (12.5, 7.6);
+
+% Encabezado
+\fill[gray!20] (0, 7.0) rectangle (12.5, 7.6);
+\draw[gray!50] (0, 7.0) -- (12.5, 7.0);
+\node[anchor=west, font=\small\bfseries] at (0.3, 7.3) {Sistema de Gestión — Farmacia Selene};
+
+% Barra lateral
+\fill[gray!8] (0, 0) rectangle (2.7, 7.0);
+\draw[gray!50] (2.7, 0) -- (2.7, 7.0);
+
+% Grupos de navegación
+\node[anchor=west, font=\scriptsize\bfseries, text=gray!60] at (0.25, 6.65) {PRINCIPAL};
+\node[anchor=west, font=\scriptsize] at (0.4, 6.32) {Dashboard};
+\fill[gray!25] (0, 5.92) rectangle (2.7, 6.22); % ítem activo
+\node[anchor=west, font=\scriptsize\bfseries] at (0.4, 6.07) {Inventario};
+\node[anchor=west, font=\scriptsize] at (0.4, 5.65) {Ventas};
+\node[anchor=west, font=\scriptsize] at (0.4, 5.3) {Catálogo};
+\draw[gray!40] (0.25, 5.05) -- (2.45, 5.05);
+\node[anchor=west, font=\scriptsize\bfseries, text=gray!60] at (0.25, 4.75) {CONFIGURACIÓN};
+\node[anchor=west, font=\scriptsize] at (0.4, 4.42) {Usuarios};
+\node[anchor=west, font=\scriptsize] at (0.4, 4.08) {Roles};
+\node[anchor=west, font=\scriptsize] at (0.4, 3.74) {Sucursales};
+\draw[gray!40] (0.25, 3.5) -- (2.45, 3.5);
+\node[anchor=west, font=\scriptsize\bfseries, text=gray!60] at (0.25, 3.2) {MONITOREO};
+\node[anchor=west, font=\scriptsize] at (0.4, 2.87) {Sensor};
+\node[anchor=west, font=\scriptsize] at (0.4, 2.53) {Estadísticas};
+\node[font=\scriptsize\itshape, text=gray!60] at (1.35, 1.1) {16 módulos};
+\node[font=\scriptsize\itshape, text=gray!60] at (1.35, 0.7) {agrupados por área};
+
+% ── Área de contenido ─────────────────────────────────────
+
+% Barra de acciones del módulo
+\fill[gray!12] (2.9, 6.6) rectangle (12.3, 7.0);
+\node[anchor=west, font=\small\bfseries] at (3.1, 6.8) {Inventario — Lotes};
+\draw[draw=gray!60, fill=white, rounded corners=1pt] (10.5, 6.65) rectangle (12.1, 6.95);
+\node[font=\scriptsize] at (11.3, 6.8) {+ Nuevo lote};
+
+% Buscador y filtros
+\draw[draw=gray!50, fill=white, rounded corners=2pt] (2.9, 6.15) rectangle (8.8, 6.5);
+\node[anchor=west, font=\scriptsize, text=gray!60] at (3.1, 6.32) {Buscar producto o lote\ldots};
+\draw[draw=gray!50, fill=gray!10, rounded corners=2pt] (9.0, 6.15) rectangle (10.3, 6.5);
+\node[font=\scriptsize] at (9.65, 6.32) {Filtros};
+\draw[draw=gray!50, fill=gray!10, rounded corners=2pt] (10.5, 6.15) rectangle (12.1, 6.5);
+\node[font=\scriptsize] at (11.3, 6.32) {Exportar};
+
+% Encabezado de tabla
+\fill[gray!20] (2.9, 5.68) rectangle (12.3, 6.05);
+\node[anchor=west, font=\scriptsize\bfseries] at (3.1, 5.87) {Producto};
+\node[anchor=west, font=\scriptsize\bfseries] at (6.0, 5.87) {No.\ Lote};
+\node[anchor=west, font=\scriptsize\bfseries] at (7.8, 5.87) {Vencimiento};
+\node[anchor=west, font=\scriptsize\bfseries] at (9.8, 5.87) {Stock};
+
+% Fila 1
+\draw[gray!30] (2.9, 5.3) -- (12.3, 5.3);
+\node[anchor=west, font=\scriptsize] at (3.1, 5.49) {Paracetamol 500 mg};
+\node[anchor=west, font=\scriptsize] at (6.0, 5.49) {L-0124};
+\node[anchor=west, font=\scriptsize] at (7.8, 5.49) {Jun 2025};
+\node[anchor=west, font=\scriptsize] at (9.8, 5.49) {120 pzas.};
+
+% Fila 2
+\draw[gray!30] (2.9, 4.92) -- (12.3, 4.92);
+\node[anchor=west, font=\scriptsize] at (3.1, 5.11) {Ibuprofeno 400 mg};
+\node[anchor=west, font=\scriptsize] at (6.0, 5.11) {L-0224};
+\node[anchor=west, font=\scriptsize] at (7.8, 5.11) {Ene 2026};
+\node[anchor=west, font=\scriptsize] at (9.8, 5.11) {85 pzas.};
+
+% Fila 3
+\draw[gray!30] (2.9, 4.54) -- (12.3, 4.54);
+\node[anchor=west, font=\scriptsize] at (3.1, 4.73) {Amoxicilina 500 mg};
+\node[anchor=west, font=\scriptsize] at (6.0, 4.73) {L-0324};
+\node[anchor=west, font=\scriptsize] at (7.8, 4.73) {Mar 2026};
+\node[anchor=west, font=\scriptsize] at (9.8, 4.73) {200 pzas.};
+
+% Borde de tabla
+\draw[gray!60] (2.9, 4.54) rectangle (12.3, 6.05);
+
+% Paginación
+\node[font=\scriptsize] at (7.5, 4.18) {$\langle$\enspace 1 \enspace 2 \enspace 3 \enspace $\cdots$\enspace $\rangle$};
+
+\end{tikzpicture}
+\caption{Estructura de la interfaz web: barra lateral con grupos de navegación (izquierda), barra de acciones con botón de alta, buscador con filtros, tabla de datos paginada y control de paginación (área de contenido)}
+\label{fig:cap3-frontend-wireframe}
+\vspace{0.2cm}
+\footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \fbox{\includegraphics[width=0.9\textwidth]{0_imagenes/Cap3/ScreenshotApp.png}}
+    \caption{Captura de pantalla de la interfaz web — módulo de inventario}
+    \label{fig:cap3-screenshot}
+    \vspace{0.2cm}
+    \footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+\subsection{Gestión de datos y formularios}
+
+El estado de la aplicación se divide en dos responsabilidades. El \textbf{estado de sesión} —usuario, rol y permisos— se almacena en un contexto global y determina qué módulos son visibles y qué operaciones están disponibles para el usuario activo. El \textbf{estado de los datos del servidor} se gestiona con una biblioteca de caché del lado del cliente: los datos consultados se conservan en memoria y se actualizan automáticamente tras cada operación sin que el usuario tenga que recargar la página.
+
+Los formularios se implementaron con \textbf{React Hook Form}, que valida cada campo antes de enviar la petición a la API. Si un dato no cumple las reglas el formulario lo indica visualmente sin generar una petición al servidor.
+
+\subsection{Autenticación en el cliente}
+
+Al iniciar sesión, la aplicación almacena el token recibido de la API y lo incluye de forma automática en cada petición posterior. Cuando el token expira, se renueva de forma transparente sin interrumpir la sesión. Las rutas de la aplicación están protegidas: si no hay sesión activa, el usuario es redirigido a la pantalla de inicio de sesión. Para operaciones que requieren permisos específicos se verifica además que el token incluya los permisos necesarios, de forma consistente con la estructura de roles del OE1.
+
+\subsection{Despliegue en Vercel}
+
+La interfaz se desplegó en \textbf{Vercel}, una plataforma especializada en aplicaciones JavaScript modernas. Se eligió sobre alternativas como AWS por la misma razón de escala que Railway: ofrece red de distribución de contenido, integración con el repositorio y despliegue automático en cada actualización, sin la complejidad de una infraestructura mayor. Se configuró además una regla de enrutamiento que redirige cualquier URL al punto de entrada de la aplicación, necesaria para que React Router pueda gestionar la navegación correctamente cuando el usuario accede directamente a una ruta o recarga la página.
+
+
+
+% =============================================
+% OE 4: NODO SENSOR ESP32
+% =============================================
+
+\clearpage
+\section{Desarrollo del nodo sensor con ESP32}
+
+Para cumplir con el cuarto objetivo específico se diseñó e implementó un nodo electrónico que mide temperatura y humedad relativa en el área de almacenamiento y envía esas lecturas a la API del OE2. El nodo está integrado por un microcontrolador \textbf{ESP32-C5}, un sensor \textbf{AHT10} y tres pantallas \textbf{OLED SSD1306}, programado en C++ con el entorno Arduino.
+
+\subsection{Selección del hardware}
+
+Se eligió el \textbf{ESP32-C5} como microcontrolador por tres razones: integra conectividad WiFi de forma nativa sin necesitar un módulo adicional, soporta el protocolo I\textsuperscript{2}C necesario para comunicarse con el sensor y las pantallas, y es compatible con el entorno Arduino, que provee bibliotecas maduras para red y manejo de datos. Se descartó el Arduino Uno por carecer de WiFi integrado, y una Raspberry Pi habría resultado sobredimensionada para la tarea concreta de leer y enviar dos valores numéricos periódicamente, con un costo y consumo de energía mayores sin beneficio funcional correspondiente.
+
+Para la medición ambiental se eligió el sensor \textbf{AHT10} sobre alternativas como el DHT11 o el DHT22 por dos razones: utiliza I\textsuperscript{2}C —el mismo bus compartido con las pantallas, sin necesitar conductores adicionales—, y ofrece una precisión de ±0.3\,°C en temperatura y ±2\% en humedad, adecuada para detectar variaciones relevantes en el almacenamiento de medicamentos donde los rangos recomendados son 15–25\,°C y 30–65\% de humedad relativa.
+
+\subsection{Arquitectura del nodo}
+
+El sensor AHT10 y las tres pantallas OLED se conectan al ESP32-C5 mediante el bus I\textsuperscript{2}C, que requiere únicamente dos conductores compartidos entre todos los dispositivos. La alimentación proviene de una fuente USB de 5\,V. La conexión con la API se realiza de forma inalámbrica a través de la red WiFi del establecimiento.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[font=\small]
+
+% Periféricos I²C (izquierda)
+\node[rectangle, draw, rounded corners=3pt, fill=gray!10,
+      minimum width=3.6cm, minimum height=1.0cm, align=center]
+    (aht) at (0, 1.4)
+    {\textbf{Sensor AHT10}\\{\footnotesize temperatura y humedad}};
+
+\node[rectangle, draw, rounded corners=3pt, fill=gray!10,
+      minimum width=3.6cm, minimum height=1.0cm, align=center]
+    (oled) at (0, -0.7)
+    {\textbf{3 pantallas OLED}\\{\footnotesize 128×64 px (SSD1306)}};
+
+% Microcontrolador (centro)
+\node[rectangle, draw, rounded corners=4pt, fill=gray!25,
+      minimum width=2.8cm, minimum height=3.6cm, align=center]
+    (esp) at (5.0, 0.35) {\textbf{ESP32-C5}};
+
+% Fuente de alimentación (abajo)
+\node[rectangle, draw, rounded corners=3pt, fill=gray!8,
+      minimum width=2.8cm, minimum height=0.75cm, align=center, font=\footnotesize]
+    (usb) at (5.0, -2.7) {Fuente USB 5\,V};
+
+% API en la nube (derecha)
+\node[rectangle, draw, rounded corners=6pt, fill=gray!15,
+      minimum width=3.4cm, minimum height=1.8cm, align=center]
+    (cloud) at (10.2, 0.35)
+    {\textbf{API REST}\\[2pt]{\footnotesize Railway}\\{\footnotesize (nube)}};
+
+% Bus I²C: barra vertical + ramales horizontales
+\draw[thick] (3.0, 1.9) -- (3.0, -1.1);
+\draw[thick] (aht.east)  -- (3.0, 1.4);
+\draw[thick] (oled.east) -- (3.0, -0.7);
+\draw[thick] (3.0, 0.35) -- (esp.west);
+\node[font=\footnotesize, anchor=east] at (2.85, 0.4)
+    {Bus I\textsuperscript{2}C};
+
+% Conexión WiFi / HTTPS hacia la API
+\draw[-{Stealth}, thick] (esp.east) --
+    node[above, font=\footnotesize]{WiFi\,/\,HTTPS}
+    (cloud.west);
+
+% Alimentación
+\draw[-{Stealth}, thick] (usb.north) --
+    node[right, font=\footnotesize]{5\,V}
+    (esp.south);
+
+\end{tikzpicture}
+\caption{Diagrama de conexiones del nodo sensor}
+\label{fig:cap3-sensor-hw}
+\vspace{0.2cm}
+\footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
+
+% TODO: agregar fotografía del nodo ensamblado
+% Guardar en 0_imagenes/Cap3/FotoNodo.png y descomentar:
+%\begin{figure}[H]
+%    \centering
+%    \fbox{\includegraphics[width=0.72\textwidth]{0_imagenes/Cap3/FotoNodo.png}}
+%    \caption{Nodo sensor ensamblado: ESP32-C5, sensor AHT10 y pantallas OLED}
+%    \label{fig:cap3-nodo-foto}
+%    \vspace{0.2cm}
+%    \footnotesize \textbf{Fuente:} Elaboración propia.
+%\end{figure}
+
+\subsection{Funcionamiento del firmware}
+
+El firmware sigue el modelo de Arduino: una función de configuración inicial que se ejecuta una sola vez al encender el dispositivo —inicializa el bus I\textsuperscript{2}C, detecta el sensor y establece la conexión WiFi— y un ciclo operativo continuo que realiza las lecturas cada 30 segundos y las envía a la API. El ciclo utiliza temporización no bloqueante: en lugar de pausar el programa durante la espera, compara continuamente el tiempo transcurrido, lo que permite verificar el estado de la conexión WiFi en cada iteración.
+
+Para la conexión WiFi se utilizó la biblioteca \textbf{WiFiManager}. En el primer arranque, el ESP32 crea una red temporal de nombre \texttt{Sensor-Farmacia}; el técnico se conecta desde un teléfono o computadora, selecciona la red del establecimiento e ingresa la contraseña. El dispositivo guarda esas credenciales y las usa automáticamente en arranques posteriores. Si se necesita cambiar la red —por ejemplo, al reubicar el dispositivo—, mantener presionado el botón de reinicio durante tres segundos borra las credenciales y reinicia el proceso de configuración.
+
+Cada lectura se valida dentro de rangos físicamente plausibles (−10\,°C a 85\,°C para temperatura; 0\% a 100\% para humedad) antes de enviarse; si cae fuera de rango, se descarta sin enviar. Las lecturas válidas se envían al \textit{endpoint} \texttt{/api/v1/sensor-readings} mediante una petición POST con cifrado HTTPS. El intervalo de 30 segundos balancea la granularidad de los datos con la carga sobre la red: lecturas más frecuentes no aportarían información adicional relevante para el monitoreo ambiental de un almacén.
+
+\subsection{Pantallas OLED}
+
+Se incorporaron tres pantallas \textbf{OLED SSD1306} de 128×64 píxeles para que el personal pueda verificar el estado del nodo —temperatura, humedad y conexión WiFi— sin necesidad de abrir la aplicación web; cada pantalla muestra un único dato para que sea legible de un vistazo. Las tres comparten el mismo bus I\textsuperscript{2}C que el sensor AHT10 y operan cada una con una dirección de bus distinta para que el ESP32 pueda dirigirles instrucciones de forma individual. La actualización ocurre tras cada ciclo de lectura, reutilizando el mismo dato que se envía a la API sin operaciones adicionales.
+
+
+% =============================================
+% OE 5: GABINETE FÍSICO E INTEGRACIÓN
+% =============================================
+
+\clearpage
+\section{Integración física y lector de código de barras}
+
+El sexto objetivo específico comprende dos componentes de integración: el diseño e impresión del gabinete físico que aloja el nodo sensor, y la incorporación de un lector de código de barras al flujo de registro de ventas en la aplicación web.
+
+\subsection{Gabinete impreso en 3D}
+
+Para alojar el ESP32, el sensor AHT10 y las tres pantallas OLED en un conjunto compacto y protegido, se diseñó y fabricó mediante \textbf{impresión 3D} un gabinete personalizado. Un gabinete a medida fue necesario porque la alineación horizontal de tres módulos OLED no corresponde a ninguna caja disponible comercialmente; una adaptación de una caja genérica habría requerido cortes imprecisos y un acabado poco profesional.
+
+El gabinete se compone de dos piezas: una base que aloja la tarjeta del microcontrolador y el cableado interno, y una tapa frontal con tres ventanas rectangulares para exponer las pantallas OLED. Una abertura lateral permite la salida del cable de alimentación USB. Las dos piezas ensamblan a presión, sin tornillos.
+
+Las decisiones de diseño respondieron a restricciones concretas. El ensamble a presión se eligió porque los componentes internos pueden requerir ajuste durante la vida útil del dispositivo: con tornillos, el acceso repetido desgasta las roscas en plástico impreso; con el encaje a presión, abrir y cerrar el gabinete no deteriora el mecanismo. El ancho mínimo lo determinaron los tres módulos OLED dispuestos en fila horizontal con sus conectores orientados hacia la base. La ventilación del sensor AHT10 se resolvió con una ranura en la base, suficientemente pequeña para evitar la entrada de polvo pero que permite la circulación del aire del área de almacenamiento.
+
+% TODO: subir 0_imagenes/Cap3/GabineteFoto.png a Overleaf para descomentar
+%\begin{figure}[H]
+%    \centering
+%    \fbox{\includegraphics[width=0.75\textwidth]{0_imagenes/Cap3/GabineteFoto.png}}
+%    \caption{Gabinete impreso en 3D con las tres pantallas OLED y el nodo sensor ensamblados}
+%    \label{fig:cap3-gabinete}
+%    \vspace{0.2cm}
+%    \footnotesize \textbf{Fuente:} Elaboración propia.
+%\end{figure}
+
+\subsection{Integración del lector de código de barras}
+
+Para agilizar el registro de ventas se incorporó un lector de código de barras USB que el sistema operativo reconoce como un teclado estándar; desde la perspectiva del navegador, el código escaneado se ingresa como si hubiera sido tecleado manualmente, sin requerir ningún controlador especial.
+
+El flujo estándar de creación de venta no estaba diseñado para el ritmo de escaneo continuo: el operador habría tenido que hacer clic en el campo correcto y esperar el resultado por cada artículo. Para que la herramienta resultara práctica en un punto de venta, se diseñó un \textbf{modo lector} en el módulo de ventas, activable desde cualquier parte del formulario con la tecla \textbf{F2}, que redirige el foco al campo de lectura sin que el usuario tenga que desplazarse.
+
+Al escanear un código, la aplicación lo compara contra el catálogo de productos cargado en memoria al abrir el formulario. Si hay coincidencia, el producto se agrega a la lista de artículos de la venta; si no la hay, el campo muestra una señal de error. La búsqueda se resuelve localmente sin generar una petición al servidor por cada código, lo que evita la latencia de red en un flujo donde múltiples artículos se escanean en secuencia rápida. El modo se desactiva automáticamente cuando el usuario hace clic fuera del área de escaneo.
+
+El diagrama siguiente resume el flujo de interacción del modo lector:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=0.55cm,
+    box/.style={rectangle, draw, rounded corners=3pt, minimum width=8.2cm, minimum height=0.82cm, align=center, font=\small, text width=7.8cm},
+    dec/.style={diamond, draw, aspect=2.5, align=center, font=\small, inner sep=2pt},
+    ok/.style={rectangle, draw, rounded corners=3pt, fill=gray!8, minimum width=3.0cm, minimum height=0.9cm, align=center, font=\small, text width=2.8cm},
+    err/.style={rectangle, draw, rounded corners=3pt, fill=gray!20, minimum width=3.0cm, minimum height=0.9cm, align=center, font=\small, text width=2.8cm},
+    arr/.style={-{Stealth}, thick}
+]
+\node[box, fill=gray!15]  (start) {\textbf{1.} Formulario de creación de venta abierto};
+\node[box, fill=gray!8,   below=of start] (f2)    {\textbf{2.} Usuario presiona F2 → modo lector activo};
+\node[box, fill=gray!10,  below=of f2]    (scan)  {\textbf{3.} Apuntar lector al código de barras};
+\node[box, fill=gray!10,  below=of scan]  (look)  {\textbf{4.} Buscar código en el catálogo local};
+\node[dec,                below=of look]  (found) {¿Producto\\encontrado?};
+\node[ok,  right=of found, xshift=0.6cm]  (add)   {Agregar /\\incrementar\\en la lista};
+\node[err, left=of found,  xshift=-0.6cm] (nf)    {Señal visual\\de error};
+\node[box, fill=gray!12, below=1.6cm of found] (flash) {\textbf{5.} Confirmar resultado visualmente};
+\node[dec,                below=of flash] (more)  {¿Más artículos\\por escanear?};
+\node[box, fill=gray!15,  below=of more]  (end)   {\textbf{6.} Clic fuera del área → modo desactivado};
+
+\draw[arr] (start) -- (f2);
+\draw[arr] (f2)    -- (scan);
+\draw[arr] (scan)  -- (look);
+\draw[arr] (look)  -- (found);
+\draw[arr] (found.east) -- node[above, font=\footnotesize]{Sí} (add.west);
+\draw[arr] (found.west) -- node[above, font=\footnotesize]{No} (nf.east);
+\draw[arr] (add.south)  |- (flash.east);
+\draw[arr] (nf.south)   |- (flash.west);
+\draw[arr] (flash) -- (more);
+\coordinate (loopL) at ($(more.west)+(-4.2,0)$);
+\draw[arr] (more.west) -- (loopL) -- (loopL |- scan.west) -- node[above, font=\footnotesize]{Sí} (scan.west);
+\draw[arr] (more)  -- node[left, font=\footnotesize]{No} (end);
+\end{tikzpicture}
+\caption{Diagrama de flujo del modo lector de código de barras en el registro de ventas}
+\label{fig:cap3-barcode-flujo}
+\vspace{0.2cm}
+\footnotesize \textbf{Fuente:} Elaboración propia.
+\end{figure}
